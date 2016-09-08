@@ -1,0 +1,5 @@
+(funtion() {
+
+'use strict';
+
+})(window);

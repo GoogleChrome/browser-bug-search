@@ -1,0 +1,62 @@
+application: browser-issue-tracker-search
+version: 1
+runtime: python27
+threadsafe: true
+api_version: 1
+
+# default_expiration: "30s"
+
+builtins:
+- remote_api: on
+
+libraries:
+- name: webapp2
+  version: "latest"
+- name: django
+  version: "1.4" #"latest"
+
+handlers:
+
+# Static handlers ---------------------------------------------------------------
+#- url: /favicon\.ico
+#  static_files: static/img/chromium-128.png
+#  upload: static/img/chromium-128\.png
+
+- url: /js
+  static_dir: js
+  #expiration: 30s
+
+- url: /bower_components/polymer/polymer.html
+  static_files: bower_components/polymer/polymer.vulcanized.html
+  upload: bower_components/polymer/polymer.vulcanized.html
+
+- url: /bower_components
+  static_dir: bower_components
+
+- url: /
+  static_files: index.html
+  upload: index\.html
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.csv$
+- ^(.*/)?.*\.psd$
+- ^(.*/)?.*\.sql[3]$
+- ^(.*/)?.*\.sh$
+- ^(.*/)?.*\.scss$
+- ^(.*/)?node_modules
+- ^(.*/)?tests
+- ^(.*/)?.[LICENSE|PATENTS|AUTHORS|CONTRIBUTING|COPYING](\.md)?
+- ^(.*/)?.*\.md$
+
+- ^http2push/example
+- ^http2push/site
+- ^static/sass
