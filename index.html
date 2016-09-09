@@ -29,8 +29,10 @@ limitations under the License.
     --md-blue-600: #1e88e5;
     --md-blue-800: #1565C0;
     --md-blue-900: #0D47A1;
+    --md-bluegrey-50: #ECEFF1;
     --md-bluegrey-100: #CFD8DC;
     --md-bluegrey-300: #90A4AE;
+    --md-bluegrey-400: #78909C;
     --md-bluegrey-500: #607D8B;
     --md-bluegrey-600: #546e7a;
     --md-bluegrey-700: #455A64;
@@ -78,6 +80,9 @@ limitations under the License.
   }
   #search-results {
     min-height: 400px;
+    max-width: 700px;
+    /*background-color: #fafafa;*/
+    /*padding: 32px;*/
   }
   .search-result {
     margin: 32px 0;
@@ -87,11 +92,19 @@ limitations under the License.
     text-decoration: none;
     font-weight: 400;
     font-size: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
-  .search-result-domain {
+  .search-result-vendor {
     font-weight: 600;
     margin-right: 8px;
     font-size: 18px;
+    white-space: nowrap;
+  }
+  .snippet {
+    color: var(--md-bluegrey-400);
+    line-height: 1.6;
   }
   .search-result-status {
     padding: 4px;
@@ -162,7 +175,6 @@ limitations under the License.
     }
     #query-results {
       margin: 32px;
-      text-align: center;
     }
   }
 </style>
@@ -190,16 +202,18 @@ limitations under the License.
   Displaying pages <span class="query-page"></span>/<span class="query-page-total"></span>.
 </h2>
 
-<template id="search-results" is="dom-repeat">
-  <div class="search-result">
-    <div class="layout horizontal center">
-      <span class="search-result-domain">[ [[item.browser]] ]</span>
-      <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
-      <span class="search-result-status" invisible$="[[!item.status]]">[[item.status]]</span>
+<div id="search-results">
+  <template id="search-results-template" is="dom-repeat">
+    <div class="search-result">
+      <div class="layout horizontal center">
+        <span class="search-result-vendor">[[[item.browser]]]</span>
+        <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
+        <span class="search-result-status" invisible$="[[!item.status]]">[[item.status]]</span>
+      </div>
+      <p class="snippet">[[item.snippet]]</p>
     </div>
-    <p class="snippet">[[item.snippet]]</p>
-  </div>
-</template>
+  </template>
+</div>
 
 <!-- <script src="app.js" async></script> -->
 <script>
@@ -210,7 +224,7 @@ const CSE_ID = '007435387813601113811:dinkwhm2suk';
 const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 
 const queryInput = document.querySelector('#q');
-const searchResults = document.querySelector('#search-results');
+const searchResults = document.querySelector('#search-results-template');
 const queryResults = document.querySelector('#query-results');
 
 const domains_to_browser = {
