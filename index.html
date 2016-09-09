@@ -17,38 +17,61 @@ limitations under the License.
 <html>
 <head>
 <meta charset="utf-8">
-<title>Mega Browser Bug Search</title>
+<title>Browser Bug Search</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
 <!-- <link rel="manifest" href="/static/manifest.json"> -->
 
-<!-- <meta name="theme-color" content="#366597"> -->
+<meta name="theme-color" content="#90A4AE">
 <!-- <link rel="icon" sizes="192x192" href="/static/img/crstatus_192.png"> -->
 <style>
+  :root {
+    --md-blue-600: #1e88e5;
+    --md-blue-800: #1565C0;
+    --md-blue-900: #0D47A1;
+    --md-bluegrey-100: #CFD8DC;
+    --md-bluegrey-300: #90A4AE;
+    --md-bluegrey-500: #607D8B;
+    --md-bluegrey-600: #546e7a;
+    --md-bluegrey-700: #455A64;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   html, body {
-    color: #444;
+    color: var(--md-bluegrey-700);
     font: 14px "Roboto", sans-serif;
     font-weight: 400;
     /*-webkit-font-smoothing: antialiased;*/
-
-    --blue-color: #1e88e5;
   }
-  body {
-    padding: 2em;
+  [hidden] {
+    display: none !important;
+  }
+  [invisible] {
+    visibility: hidden !important;
   }
   h1, h2, h3, h4 {
     font-weight: inherit;
+    margin: 0;
+    font-weight: 300;
   }
-  h1 {
-    color: #1E88E5;
+  header {
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 3px solid #1565C0;
+    border-bottom: 3px solid var(--md-bluegrey-100);
+  }
+  header h2 {
+    color: var(--md-bluegrey-300);
+    margin-top: 8px;
   }
   #q {
     padding: 8px;
-    min-width: 200px;
+    width: 200px;
     font-size: inherit;
+    border: 1px solid #ccc;
+    max-width: 50%;
   }
   #search-section {
     margin: 32px 0;
@@ -60,7 +83,7 @@ limitations under the License.
     margin: 32px 0;
   }
   .search-result a {
-    color: var(--blue-color);
+    color: var(--md-blue-600);
     text-decoration: none;
     font-weight: 400;
     font-size: 18px;
@@ -70,44 +93,77 @@ limitations under the License.
     margin-right: 8px;
     font-size: 18px;
   }
+  .search-result-status {
+    padding: 4px;
+    border-radius: 3px;
+    background-color: var(--md-blue-800);
+    color: #fff;
+    display: inline-block;
+    min-height: 22px;
+    margin-left: 8px;
+    font-size: smaller;
+  }
   .layout.horizontal {
     display: flex;
   }
   .layout.horizontal.center {
-    justify-content: center;
+    align-items: center;
   }
   .layout.horizontal.center-center {
     justify-content: center;
     align-items: center;
   }
-  .next-buttons {
-    margin-left: 16px;
+  .layout.horizontal.wrap {
+    flex-wrap: wrap;
   }
   .next-buttons button {
     border: none;
     color: #fff;
-    background: var(--blue-color);
+    background: var(--md-blue-600);
     text-transform: uppercase;
     font-size: inherit;
     font-weight: 300;
-    padding: 3px 20px;
     border-radius: 2px;
-    margin: 0 8px;
     cursor: pointer;
+    min-height: 35px;
+    margin-left: 4px;
   }
   .next-buttons button[disabled] {
     background-color: #ccc;
     pointer-events: none;
   }
-  #query-results {
-    text-align: center;
-    margin: 32px;
-  }
-  #query-results[hidden] {
-    display: none;
-  }
   .query-term {
-    color: var(--blue-color);
+    color: var(--md-blue-600);
+  }
+  .embed body {
+    margin: 0;
+  }
+  .embed header {
+    display: none
+  }
+  @media (max-width: 599px) {
+    header h2 {
+      font-size: 3.5vw;
+    }
+    #query-results {
+      font-size: 18px;
+    }
+  }
+  @media (min-width: 600px) {
+    body {
+      padding: 2em;
+    }
+    .next-buttons {
+      margin-left: 16px;
+    }
+    .next-buttons button {
+      margin: 0 8px;
+      padding: 3px 20px;
+    }
+    #query-results {
+      margin: 32px;
+      text-align: center;
+    }
   }
 </style>
 
@@ -116,25 +172,31 @@ limitations under the License.
 </head>
 <body>
 
-<h1>Mega Browser Bug Search</h1>
+<header>
+  <h1 class="title">Browser Bug Search</h1>
+  <h2>search for bugs across all the major browser vendors</h2>
+</header>
 
 <div id="search-section" class="layout horizontal">
   <input id="q" type="text" placeholder="CSS flexbox" autocomplete="off">
   <div class="layout horizontal next-buttons">
-    <button id="prev-results-button" disabled>&laquo; Prev results</button>
-    <button id="next-results-button" disabled>Next results &raquo;</button>
+    <button id="prev-results-button" disabled>&laquo; Prev</button>
+    <button id="next-results-button" disabled>Next &raquo;</button>
   </div>
 </div>
 
 <h2 id="query-results" hidden>
   <span class="query-total-results"></span> results for "<span class="query-term"></span>".
-  Displaying page <span class="query-page"></span>/<span class="query-page-total"></span>.
+  Displaying pages <span class="query-page"></span>/<span class="query-page-total"></span>.
 </h2>
 
 <template id="search-results" is="dom-repeat">
   <div class="search-result">
-    <span class="search-result-domain">[ [[item.browser]] ]</span>
-    <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
+    <div class="layout horizontal center">
+      <span class="search-result-domain">[ [[item.browser]] ]</span>
+      <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
+      <span class="search-result-status" invisible$="[[!item.status]]">[[item.status]]</span>
+    </div>
     <p class="snippet">[[item.snippet]]</p>
   </div>
 </template>
@@ -155,27 +217,113 @@ const domains_to_browser = {
   'bugs.chromium.org': 'Chromium',
   'developer.microsoft.com': 'Edge',
   'bugzilla.mozilla.org': 'Mozilla',
-  'bugs.webkit.org': 'Webkit'
+  'bugs.webkit.org': 'WebKit'
 };
+
+const CLOSED_STATUSES = [
+  'Fixed',
+  'WontFix',
+  'Closed'
+];
 
 let nextStartIndex;
 let prevStartIndex;
 
-queryInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.keyCode === 13) {
-    doSearch();
+
+class Bug {
+  constructor(url) {
+    this.url = url;
+    this.needsCors = false;
   }
-});
 
-let nextButton = document.querySelector('#next-results-button');
-nextButton.addEventListener('click', e => {
-  doSearch(nextStartIndex);
-});
+  static get CORS_PREFIX() {
+    return 'https://crossorigin.me';
+  }
 
-let prevButton = document.querySelector('#prev-results-button');
-prevButton.addEventListener('click', e => {
-  doSearch(prevStartIndex);
-});
+  fetchPage(url=this.url) {
+    if (this.needsCors) {
+      url = `${Bug.CORS_PREFIX}/${url}`;
+    }
+
+    return new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'document';
+      xhr.open('GET', url, true);
+      xhr.onload = function(e) {
+        resolve(e.target.response);
+      };
+      xhr.onerror = reject;
+      xhr.send();
+    });
+  }
+}
+
+class CrBug extends Bug {
+  constructor(url) {
+    super(url);
+    this.needsCors = true;
+  }
+
+  findStatus(doc) {
+    const statusEl = doc.querySelector('#issuemeta');
+    if (statusEl) {
+      // Status is first <td> of #issuemeta.
+      const status = statusEl.querySelector('td');
+      if (status) {
+        return status.textContent.trim();
+      }
+    }
+    return null;
+  }
+}
+
+class WebKitBug extends Bug {
+  constructor(url) {
+    super(url);
+  }
+
+  findStatus(doc) {
+    const statusEl = doc.querySelector('#static_bug_status');
+    if (statusEl) {
+      return statusEl.textContent.replace('\n', '')
+                                 .replace(/ +(?=)/g, ' ').trim();
+    }
+    return null;
+  }
+}
+
+class MozillaBug extends Bug {
+  constructor(url) {
+    super(url);
+    this.needsCors = true;
+  }
+
+  findStatus(doc) {
+    const statusEl = doc.querySelector('#static_bug_status');
+    if (statusEl) {
+      return statusEl.textContent.replace('\n', '')
+                                 .replace(/ +(?=)/g, ' ').trim();
+    }
+    return null;
+  }
+}
+
+class EdgeBug extends Bug {
+  constructor(url) {
+    super(url);
+    this.needsCors = true;
+  }
+
+  findStatus(doc) {
+    const statusEl = doc.querySelector('.bug-status');
+    if (statusEl) {
+      return statusEl.textContent.replace('\n', '')
+                                 .replace(/ +(?=)/g, ' ').trim();
+    }
+    return null;
+  }
+}
+
 
 function doSearch(startIndex=null) {
   resetUI();
@@ -194,12 +342,72 @@ function doSearch(startIndex=null) {
 }
 
 function formatResults(results) {
+  const items = results.items;
+
   updateQueryStats(results);
 
-  const items = results.items;
-  items.map(function(item) {
+  if (!items) {
+    return;
+  }
+
+  items.map(function(item, i) {
+    item.status = '';
     item.browser = domains_to_browser[item.displayLink] || item.displayLink;
+
+    let match;
+
+    switch (item.browser) {
+      case 'Chromium':
+        match = item.title.match(/Issue (\d+) - chromium - (.*) [Monorail]?/i);
+
+console.log(item.title);
+
+        let crbug = new CrBug(item.link);
+        crbug.fetchPage().then(doc => crbug.findStatus(doc)).then(status => {
+          status = status.toUpperCase() || 'Unknown';
+          searchResults.set(`items.${i}.status`, status);
+        });
+
+        break;
+      case 'Edge':
+
+        let edgeBug = new EdgeBug(item.link);
+        edgeBug.fetchPage().then(doc => edgeBug.findStatus(doc)).then(status => {
+          status = status.toUpperCase();
+          searchResults.set(`items.${i}.status`, status);
+        });
+
+        break;
+      case 'Mozilla':
+        match = item.title.match(/(\d+) – (.*)/i);
+
+        let mozillaBug = new MozillaBug(item.link);
+        mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
+          status = status.toUpperCase().replace(/RESOLVED(.*)?/, 'FIXED');
+          searchResults.set(`items.${i}.status`, status);
+        });
+
+        break;
+      case 'WebKit':
+        match = item.title.match(/Bug (\d+) – (.*)/i);
+
+        let webkitBug = new WebKitBug(item.link);
+        webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
+          status = status.toUpperCase();//.replace('RESOLVED FIXED', 'FIXED');
+          searchResults.set(`items.${i}.status`, status);
+        });
+
+        break;
+      default:
+        // noop
+    }
+
+    if (match) {
+      // Remove trailing " -" from titles.
+      item.title = match[2].replace(/ -$/, '');
+    }
   });
+
   searchResults.items = items;
 
   if (results.queries.nextPage) {
@@ -216,12 +424,16 @@ function formatResults(results) {
     prevButton.disabled = true;
   }
 
-  history.pushState({}, '', `?q=${queryInput.value}`);
+  let url = `?q=${queryInput.value}`;
+  if ((new URL(location)).searchParams.has('embed')) {
+    url += '&embed';
+  }
+  history.pushState({}, '', url);
 }
 
 function updateQueryStats(results) {
-  const totalResults = results.searchInformation.totalResults;
-  const startIdx = results.queries.request[0].startIndex;
+  const totalResults = parseInt(results.searchInformation.totalResults) || 0;
+  const startIdx = results.queries.request[0].startIndex || 0;
   const num = results.queries.request[0].count;
 
   queryResults.querySelector('.query-total-results').textContent = totalResults;
@@ -240,11 +452,31 @@ function resetUI() {
   prevButton.disabled = true;
 }
 
+queryInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    doSearch();
+  }
+});
+
+let nextButton = document.querySelector('#next-results-button');
+nextButton.addEventListener('click', e => {
+  doSearch(nextStartIndex);
+});
+
+let prevButton = document.querySelector('#prev-results-button');
+prevButton.addEventListener('click', e => {
+  doSearch(prevStartIndex);
+});
+
 const url = new URL(location);
 const query = url.searchParams.get('q');
 if (query) {
   queryInput.value = query;
   doSearch();
+}
+
+if (url.searchParams.has('embed')) {
+  document.documentElement.classList.add('embed');
 }
 
 })(window);
