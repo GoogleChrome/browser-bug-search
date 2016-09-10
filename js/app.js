@@ -21,12 +21,20 @@ const CLOSED_STATUSES = [
   'WONTFIX',
   'CLOSED',
   'RESOLVED',
+  'RESOLVED FIXED',
   'DUPLICATE'
 ];
 
 let nextStartIndex;
 let prevStartIndex;
-let includeFixedIssues = filterFixed.checked;
+
+const filters = {
+  includeFixed: filterFixed.checked,
+  includeChromium: true,
+  includeMozilla: true,
+  includeEdge: true,
+  includeWebKit: true
+};
 
 class Bug {
   constructor(url) {
@@ -71,7 +79,7 @@ class CrBug extends Bug {
         return status.textContent.trim();
       }
     }
-    return null;
+    return '';
   }
 }
 
@@ -86,7 +94,7 @@ class WebKitBug extends Bug {
       return statusEl.textContent.replace('\n', '')
                                  .replace(/ +(?=)/g, ' ').trim();
     }
-    return null;
+    return '';
   }
 }
 
@@ -102,7 +110,7 @@ class MozillaBug extends Bug {
       return statusEl.textContent.replace('\n', '')
                                  .replace(/ +(?=)/g, ' ').trim();
     }
-    return null;
+    return '';
   }
 }
 
@@ -118,8 +126,32 @@ class EdgeBug extends Bug {
       return statusEl.textContent.replace('\n', '')
                                  .replace(/ +(?=)/g, ' ').trim();
     }
-    return null;
+    return '';
   }
+}
+
+function getQuery() {
+  const siteSearch = [];
+
+  if (filters.includeChromium) {
+    siteSearch.push('site:bugs.chromium.org');
+  }
+  if (filters.includeEdge) {
+    siteSearch.push('site:developer.microsoft.com');
+  }
+  if (filters.includeMozilla) {
+    siteSearch.push('site:bugzilla.mozilla.org');
+  }
+  if (filters.includeWebKit) {
+    siteSearch.push('site:bugs.webkit.org');
+  }
+
+  let q = queryInput.value;
+  if (siteSearch.length) {
+    q = `${siteSearch.join(' OR ')} ${q}`;
+  }
+
+  return q;
 }
 
 
@@ -127,7 +159,7 @@ function doSearch(startIndex=null) {
   resetUI();
 
   const url = new URL('https://www.googleapis.com/customsearch/v1');
-  url.searchParams.set('q', queryInput.value);
+  url.searchParams.set('q', getQuery());
   url.searchParams.set('key', API_KEY);
   url.searchParams.set('cx', CSE_ID);
   // url.searchParams.append('excludeTerms', 'Status: Fixed');
@@ -149,7 +181,7 @@ function doSearch(startIndex=null) {
 function updateStatus(status, i) {
   searchResults.set(`items.${i}.status`, status);
 
-  if (!includeFixedIssues && CLOSED_STATUSES.includes(status)) {
+  if (!filters.includeFixed && CLOSED_STATUSES.includes(status)) {
     searchResults.set(`items.${i}.filterOut`, true);
   }
 }
@@ -162,13 +194,6 @@ function formatResults(results) {
   if (!items) {
     return;
   }
-
-  // items = items.filter(function(item, i) {
-  //   if (!includeFixedIssues) {
-
-  //   }
-  //   return item;
-  // });
 
   let promises = [];
 
@@ -321,18 +346,35 @@ queryInput.addEventListener('keydown', e => {
   }
 });
 
-let nextButton = document.querySelector('#next-results-button');
+const nextButton = document.querySelector('#next-results-button');
 nextButton.addEventListener('click', e => {
   doSearch(nextStartIndex);
 });
 
-let prevButton = document.querySelector('#prev-results-button');
+const prevButton = document.querySelector('#prev-results-button');
 prevButton.addEventListener('click', e => {
   doSearch(prevStartIndex);
 });
 
-filterFixed.addEventListener('change', e => {
-  includeFixedIssues = e.target.checked;
+const filtersEls = document.querySelector('#filters');
+filtersEls.addEventListener('change', e => {
+  switch (e.target.dataset.type) {
+    case 'fixed':
+      filters.includeFixed = e.target.checked;
+      break;
+    case 'chromium':
+      filters.includeChromium = e.target.checked;
+      break;
+    case 'edge':
+      filters.includeEdge = e.target.checked;
+      break;
+    case 'mozilla':
+      filters.includeMozilla = e.target.checked;
+      break;
+    case 'webkit':
+      filters.includeWebKit = e.target.checked;
+      break;
+  }
   doSearch();
 });
 

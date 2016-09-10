@@ -34,8 +34,7 @@ h1, h2, h3, h4 {
 }
 header {
   margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 3px solid var(--md-bluegrey-100);
+
 }
 header h2 {
   color: var(--md-bluegrey-300);
@@ -49,7 +48,14 @@ header h2 {
   max-width: 50%;
 }
 #search-section {
-  margin: 32px 0;
+  margin: 32px 0 16px 0;
+}
+#filters {
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--md-bluegrey-100);
+}
+#query-results {
+  margin: 16px 0;
 }
 #search-results {
   min-height: 400px;

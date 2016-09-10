@@ -43,9 +43,14 @@ limitations under the License.
     <button id="prev-results-button" disabled>&laquo; Prev</button>
     <button id="next-results-button" disabled>Next &raquo;</button>
   </div>
-  <div class="layout horizontal">
-    <label><input type="checkbox" id="filter-fixed" checked> Include fixed results</label>
-  </div>
+</div>
+
+<div id="filters" class="layout vertical">
+  <label><input type="checkbox" id="filter-chromium" data-type="chromium" checked> Chromium</label>
+  <label><input type="checkbox" id="filter-moz" data-type="mozilla" checked> Mozilla</label>
+  <label><input type="checkbox" id="filter-edge" data-type="edge" checked> Edge</label>
+  <label><input type="checkbox" id="filter-webkit" data-type="webkit" checked> WebKit</label>
+  <label><input type="checkbox" id="filter-fixed" data-type="fixed" checked> Include "fixed" issues</label>
 </div>
 
 <h2 id="query-results" hidden>
