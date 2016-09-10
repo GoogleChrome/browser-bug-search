@@ -37,11 +37,14 @@ limitations under the License.
   <h2>search for bugs across all the major browser vendors</h2>
 </header>
 
-<div id="search-section" class="layout horizontal">
-  <input id="q" type="text" placeholder="CSS flexbox" autocomplete="off">
+<div id="search-section" class="layout horizontal center">
+  <input id="q" type="text" placeholder="CSS flexbox">
   <div class="layout horizontal next-buttons">
     <button id="prev-results-button" disabled>&laquo; Prev</button>
     <button id="next-results-button" disabled>Next &raquo;</button>
+  </div>
+  <div class="layout horizontal">
+    <label><input type="checkbox" id="filter-fixed" checked> Include fixed results</label>
   </div>
 </div>
 
@@ -54,7 +57,7 @@ limitations under the License.
   <template id="search-results-template" is="dom-repeat">
   <!-- <dom-repeat id="search-results-template"> -->
     <!-- <template> -->
-      <div class="search-result">
+      <div class="search-result" faded$="[[item.filterOut]]">
         <div class="layout horizontal center">
           <span class="search-result-vendor">[[[item.browser]]]</span>
           <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>

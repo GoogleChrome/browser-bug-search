@@ -59,7 +59,13 @@ header h2 {
 }
 .search-result {
   margin: 32px 0;
+  transition: opacity 200ms ease-in-out;
+  will-change: opacity;
 }
+.search-result[faded] {
+  opacity : 0.3;
+}
+
 .search-result a {
   color: var(--md-blue-600);
   text-decoration: none;

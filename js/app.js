@@ -7,6 +7,7 @@ const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
 const queryResults = document.querySelector('#query-results');
+const filterFixed = document.querySelector('#filter-fixed');
 
 const domains_to_browser = {
   'bugs.chromium.org': 'Chromium',
@@ -15,15 +16,17 @@ const domains_to_browser = {
   'bugs.webkit.org': 'WebKit'
 };
 
-// const CLOSED_STATUSES = [
-//   'Fixed',
-//   'WontFix',
-//   'Closed'
-// ];
+const CLOSED_STATUSES = [
+  'FIXED',
+  'WONTFIX',
+  'CLOSED',
+  'RESOLVED',
+  'DUPLICATE'
+];
 
 let nextStartIndex;
 let prevStartIndex;
-
+let includeFixedIssues = filterFixed.checked;
 
 class Bug {
   constructor(url) {
@@ -126,9 +129,14 @@ function doSearch(startIndex=null) {
   const url = new URL('https://www.googleapis.com/customsearch/v1');
   url.searchParams.set('q', queryInput.value);
   url.searchParams.set('key', API_KEY);
-  // url.searchParams.set('num', 20);
-  // url.searchParams.set('filter', 1);
   url.searchParams.set('cx', CSE_ID);
+  // url.searchParams.append('excludeTerms', 'Status: Fixed');
+  // url.searchParams.append('excludeTerms', 'Status: WontFix');
+  // url.searchParams.append('excludeTerms', 'Status: RESOLVED');
+  // url.searchParams.append('excludeTerms', 'RESOLVED FIXED');
+  // url.searchParams.append('excludeTerms', 'RESOLVED WORKSFORME');
+  // url.searchParams.append('excludeTerms', 'Status: Fixed|Closed');
+
   if (startIndex) {
     url.searchParams.set('start', startIndex);
   }
@@ -136,6 +144,14 @@ function doSearch(startIndex=null) {
   fetch(url).then(resp => resp.json()).then(json => {
     formatResults(json);
   });
+}
+
+function updateStatus(status, i) {
+  searchResults.set(`items.${i}.status`, status);
+
+  if (!includeFixedIssues && CLOSED_STATUSES.includes(status)) {
+    searchResults.set(`items.${i}.filterOut`, true);
+  }
 }
 
 function formatResults(results) {
@@ -146,6 +162,15 @@ function formatResults(results) {
   if (!items) {
     return;
   }
+
+  // items = items.filter(function(item, i) {
+  //   if (!includeFixedIssues) {
+
+  //   }
+  //   return item;
+  // });
+
+  let promises = [];
 
   items.map(function(item, i) {
     item.status = '';
@@ -160,39 +185,47 @@ function formatResults(results) {
 // console.log(item.title);
 
         let crbug = new CrBug(item.link);
-        crbug.fetchPage().then(doc => crbug.findStatus(doc)).then(status => {
+        var p = crbug.fetchPage().then(doc => crbug.findStatus(doc)).then(status => {
           status = status.toUpperCase() || 'Unknown';
-          searchResults.set(`items.${i}.status`, status);
+          updateStatus(status, i);
         });
+
+        promises.push(p);
 
         break;
       case 'Edge':
 
         let edgeBug = new EdgeBug(item.link);
-        edgeBug.fetchPage().then(doc => edgeBug.findStatus(doc)).then(status => {
+        var p = edgeBug.fetchPage().then(doc => edgeBug.findStatus(doc)).then(status => {
           status = status.toUpperCase();
-          searchResults.set(`items.${i}.status`, status);
+          updateStatus(status, i);
         });
+
+        promises.push(p);
 
         break;
       case 'Mozilla':
         match = item.title.match(/(\d+) – (.*)/i);
 
         let mozillaBug = new MozillaBug(item.link);
-        mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
-          status = status.toUpperCase().replace(/RESOLVED(.*)?/, 'FIXED');
-          searchResults.set(`items.${i}.status`, status);
+        var p = mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
+          status = status.toUpperCase();//.replace(/RESOLVED(.*)?/, 'FIXED');
+          updateStatus(status, i);
         });
+
+        promises.push(p);
 
         break;
       case 'WebKit':
         match = item.title.match(/Bug (\d+) – (.*)/i);
 
         let webkitBug = new WebKitBug(item.link);
-        webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
+        var p = webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
           status = status.toUpperCase();//.replace('RESOLVED FIXED', 'FIXED');
-          searchResults.set(`items.${i}.status`, status);
+          updateStatus(status, i);
         });
+
+        promises.push(p);
 
         break;
       default:
@@ -204,6 +237,14 @@ function formatResults(results) {
       item.title = match[2].replace(/ -$/, '');
     }
   });
+
+  // Promise.all(promises).then(list => {
+  //   // list.filter(obj => {
+  //   //   if (obj && obj.remove) {
+  //   //     searchResults.splice('items', obj.idx, 1);
+  //   //   }
+  //   // });
+  // });
 
   searchResults.items = items;
 
@@ -288,6 +329,11 @@ nextButton.addEventListener('click', e => {
 let prevButton = document.querySelector('#prev-results-button');
 prevButton.addEventListener('click', e => {
   doSearch(prevStartIndex);
+});
+
+filterFixed.addEventListener('change', e => {
+  includeFixedIssues = e.target.checked;
+  doSearch();
 });
 
 const url = new URL(location);
