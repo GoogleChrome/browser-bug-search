@@ -1,0 +1,22 @@
+{
+  "name": "browser-issue-tracker",
+  "authors": [
+    "Eric Bidelman <ericbidelman@chromium.org>"
+  ],
+  "description": "Search across all major browser issue trackers.",
+  "main": "",
+  "license": "Apcache-2",
+  "homepage": "https://browser-issue-tracker-search.appspot.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer2": "Polymer/polymer#2.0-preview",
+    "url-search-params": "WebReflection/url-search-params#^0.6.0",
+    "polymer": "Polymer/polymer#^1.6.1"
+  }
+}

@@ -22,6 +22,10 @@ handlers:
 #  static_files: static/img/chromium-128.png
 #  upload: static/img/chromium-128\.png
 
+- url: /css
+  static_dir: css
+  #expiration: 30s
+
 - url: /js
   static_dir: js
   #expiration: 30s
