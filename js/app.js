@@ -358,6 +358,10 @@ prevButton.addEventListener('click', e => {
 
 const filtersEls = document.querySelector('#filters');
 filtersEls.addEventListener('change', e => {
+  if (!queryInput.value) {
+    return;
+  }
+
   switch (e.target.dataset.type) {
     case 'fixed':
       filters.includeFixed = e.target.checked;
@@ -375,6 +379,9 @@ filtersEls.addEventListener('change', e => {
       filters.includeWebKit = e.target.checked;
       break;
   }
+
+  // TODO: don't redo search if there are already results on the page.
+  // Just update data model.
   doSearch();
 });
 
