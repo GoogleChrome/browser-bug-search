@@ -54,6 +54,9 @@ header h2 {
   padding-bottom: 16px;
   border-bottom: 3px solid var(--md-bluegrey-100);
 }
+label {
+  white-space: nowrap;
+}
 #query-results {
   margin: 16px 0;
 }
