@@ -449,7 +449,7 @@ filtersEls.addEventListener('change', e => {
 
   // TODO: don't redo search if there are already results on the page.
   // Just update data model.
-  doSearch();
+  doSearch().then(results => populateResultsPage(results));
 });
 
 const url = new URL(location);
