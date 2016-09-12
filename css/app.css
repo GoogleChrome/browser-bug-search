@@ -36,7 +36,15 @@ h1, h2, h3, h4 {
 }
 header {
   margin-bottom: 16px;
-
+}
+.browser-logos {
+  background: url("/img/browsers-logos.png") no-repeat 0% 50%;
+  background-size: cover;
+  height: 24px;
+  width: 145px;
+  margin-left: 8px;
+  /*-webkit-filter: grayscale(0.6);*/
+  /*filter: grayscale(0.6);*/
 }
 header h2 {
   color: var(--md-bluegrey-300);
@@ -187,6 +195,9 @@ label {
 }
 
 @media (max-width: 599px) {
+  header h1 {
+    font-size: 5vw;
+  }
   header h2 {
     font-size: 3.5vw;
   }
@@ -198,6 +209,9 @@ label {
 @media (min-width: 600px) {
   body {
     padding: 2em;
+  }
+  .browser-logos {
+    margin-left: 16px;
   }
   .next-buttons {
     margin-left: 16px;
