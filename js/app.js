@@ -27,7 +27,7 @@ const searchResults = document.querySelector('#search-results-template');
 const autoCompleteTemplate = document.querySelector('#autocomplete-results-template');
 const autoComplete = document.querySelector('#autocomplete-results');
 const queryResults = document.querySelector('#query-results');
-const filterFixed = document.querySelector('#filter-fixed');
+const fadeFixed = document.querySelector('#fade-fixed');
 
 const domains_to_browser = {
   'bugs.chromium.org': 'Chromium',
@@ -52,7 +52,7 @@ let isSearching = false; // True if the user is typing the search input.
 let _fetching = false; // True when there's an outstanding query to the CSE API.
 
 const filters = {
-  includeFixed: filterFixed.checked,
+  fadeFixed: fadeFixed.checked,
   includeChromium: true,
   includeMozilla: true,
   includeEdge: true,
@@ -211,7 +211,7 @@ function doSearch(startIndex=null) {
 function updateStatus(status, i) {
   searchResults.set(`items.${i}.status`, status);
 
-  if (!filters.includeFixed && CLOSED_STATUSES.includes(status)) {
+  if (filters.fadeFixed && CLOSED_STATUSES.includes(status)) {
     searchResults.set(`items.${i}.filterOut`, true);
   }
 }
@@ -483,7 +483,7 @@ filtersEls.addEventListener('change', e => {
 
   switch (e.target.dataset.type) {
     case 'fixed':
-      filters.includeFixed = e.target.checked;
+      filters.fadeFixed = e.target.checked;
       break;
     case 'chromium':
       filters.includeChromium = e.target.checked;
