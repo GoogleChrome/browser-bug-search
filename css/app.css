@@ -46,7 +46,38 @@ header h2 {
   font-size: inherit;
   border: 1px solid #ccc;
   max-width: 50%;
+  min-width: 200px;
 }
+#autocomplete-results {
+  position: absolute;
+  background: #fff;
+  padding: 8px;
+  z-index: 1;
+  width: 400px;
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+              0 1px 10px 0 rgba(0, 0, 0, 0.12),
+              0 2px 4px -1px rgba(0, 0, 0, 0.4);
+}
+#search-container {
+  position: relative;
+}
+.autocomplete-result {
+  padding: 4px 0;
+}
+.autocomplete-result .autocomplete-browser {
+  min-width: 80px;
+}
+.autocomplete-result a {
+  font-size: inherit !important;
+}
+.autocomplete-hint {
+  font-style: italic;
+  color: var(--md-bluegrey-300);
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
 #search-section {
   margin: 32px 0 16px 0;
 }
@@ -75,10 +106,10 @@ label {
   opacity : 0.3;
 }
 
-.search-result a {
+.search-result a,
+.autocomplete-result a {
   color: var(--md-blue-600);
   text-decoration: none;
-  font-weight: 400;
   font-size: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;

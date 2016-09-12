@@ -38,7 +38,20 @@ limitations under the License.
 </header>
 
 <div id="search-section" class="layout horizontal center">
-  <input id="q" type="text" placeholder="CSS flexbox">
+  <div id="search-container">
+    <input id="q" type="text" placeholder="CSS flexbox" autocomplete="off">
+    <div id="autocomplete-results" hidden>
+      <template id="autocomplete-results-template" is="dom-repeat">
+        <div class="autocomplete-result">
+          <div class="layout horizontal center">
+            <span class="autocomplete-browser">[[[item.browser]]]</span>
+            <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
+          </div>
+        </div>
+      </template>
+      <div class="autocomplete-hint">Hit "Enter" to see full page results</div>
+    </div>
+  </div>
   <div class="layout horizontal next-buttons">
     <button id="prev-results-button" disabled>&laquo; Prev</button>
     <button id="next-results-button" disabled>Next &raquo;</button>

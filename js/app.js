@@ -6,6 +6,8 @@ const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
+const autoCompleteTemplate = document.querySelector('#autocomplete-results-template');
+const autoComplete = document.querySelector('#autocomplete-results');
 const queryResults = document.querySelector('#query-results');
 const filterFixed = document.querySelector('#filter-fixed');
 
@@ -27,6 +29,8 @@ const CLOSED_STATUSES = [
 
 let nextStartIndex;
 let prevStartIndex;
+let lastResults = {};
+let isSearching = false;
 
 const filters = {
   includeFixed: filterFixed.checked,
@@ -154,7 +158,6 @@ function getQuery() {
   return q;
 }
 
-
 function doSearch(startIndex=null) {
   resetUI();
 
@@ -163,19 +166,18 @@ function doSearch(startIndex=null) {
   url.searchParams.set('key', API_KEY);
   url.searchParams.set('cx', CSE_ID);
   // url.searchParams.append('excludeTerms', 'Status: Fixed');
-  // url.searchParams.append('excludeTerms', 'Status: WontFix');
-  // url.searchParams.append('excludeTerms', 'Status: RESOLVED');
-  // url.searchParams.append('excludeTerms', 'RESOLVED FIXED');
-  // url.searchParams.append('excludeTerms', 'RESOLVED WORKSFORME');
-  // url.searchParams.append('excludeTerms', 'Status: Fixed|Closed');
 
   if (startIndex) {
     url.searchParams.set('start', startIndex);
   }
 
-  fetch(url).then(resp => resp.json()).then(json => {
-    formatResults(json);
-  });
+  return fetch(url)
+      .then(resp => resp.json())
+      .then(json => {
+        lastResults = json;
+        return lastResults;
+      })
+      .then(results => formatResults(results));
 }
 
 function updateStatus(status, i) {
@@ -186,28 +188,12 @@ function updateStatus(status, i) {
   }
 }
 
-function formatResults(results) {
-  const items = results.items;
-
-  updateQueryStats(results);
-
-  if (!items) {
-    return;
-  }
-
-  let promises = [];
+function populateBugStatus(items) {
+  const promises = [];
 
   items.map(function(item, i) {
-    item.status = '';
-    item.browser = domains_to_browser[item.displayLink] || item.displayLink;
-
-    let match;
-
     switch (item.browser) {
       case 'Chromium':
-        match = item.title.match(/Issue (\d+) - chromium - (.*) [Monorail]?/i);
-
-// console.log(item.title);
 
         let crbug = new CrBug(item.link);
         var p = crbug.fetchPage().then(doc => crbug.findStatus(doc)).then(status => {
@@ -219,7 +205,6 @@ function formatResults(results) {
 
         break;
       case 'Edge':
-
         let edgeBug = new EdgeBug(item.link);
         var p = edgeBug.fetchPage().then(doc => edgeBug.findStatus(doc)).then(status => {
           status = status.toUpperCase();
@@ -230,8 +215,6 @@ function formatResults(results) {
 
         break;
       case 'Mozilla':
-        match = item.title.match(/(\d+) – (.*)/i);
-
         let mozillaBug = new MozillaBug(item.link);
         var p = mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
           status = status.toUpperCase();//.replace(/RESOLVED(.*)?/, 'FIXED');
@@ -242,8 +225,6 @@ function formatResults(results) {
 
         break;
       case 'WebKit':
-        match = item.title.match(/Bug (\d+) – (.*)/i);
-
         let webkitBug = new WebKitBug(item.link);
         var p = webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
           status = status.toUpperCase();//.replace('RESOLVED FIXED', 'FIXED');
@@ -256,11 +237,6 @@ function formatResults(results) {
       default:
         // noop
     }
-
-    if (match) {
-      // Remove trailing " -" from titles.
-      item.title = match[2].replace(/ -$/, '');
-    }
   });
 
   // Promise.all(promises).then(list => {
@@ -270,8 +246,14 @@ function formatResults(results) {
   //   //   }
   //   // });
   // });
+}
 
-  searchResults.items = items;
+function populateResultsPage() {
+  let results = lastResults;
+
+  updateQueryStats(results);
+
+  searchResults.items = results.items;
 
   if (results.queries.nextPage) {
     nextButton.disabled = false;
@@ -294,6 +276,45 @@ function formatResults(results) {
   history.pushState({}, '', url);
 }
 
+function formatResults(results) {
+  const items = results.items;
+
+  if (!items) {
+    return;
+  }
+
+  items.map(function(item, i) {
+    item.status = '';
+    item.browser = domains_to_browser[item.displayLink] || item.displayLink;
+
+    let match;
+
+    switch (item.browser) {
+      case 'Chromium':
+        match = item.title.match(/Issue (\d+) - chromium - (.*) [Monorail]?/i);
+        break;
+      case 'Mozilla':
+        match = item.title.match(/(\d+) – (.*)/i);
+        break;
+      case 'WebKit':
+        match = item.title.match(/Bug (\d+) – (.*)/i);
+        break;
+      default:
+        // noop
+    }
+
+    if (match) {
+      // Remove trailing " -" from titles.
+      item.title = match[2].replace(/ -$/, '');
+    }
+  });
+
+  autoCompleteTemplate.items = items.slice(0, 5);
+  autoComplete.removeAttribute('invisible');
+
+  return results;
+}
+
 function updateQueryStats(results) {
   const totalResults = parseInt(results.searchInformation.totalResults) || 0;
   const startIdx = results.queries.request[0].startIndex || 0;
@@ -313,6 +334,7 @@ function resetUI() {
   searchResults.items = [];
   nextButton.disabled = true;
   prevButton.disabled = true;
+  lastResults = {};
 }
 
 function lazyLoadWCPolyfillsIfNecessary() {
@@ -340,10 +362,53 @@ function lazyLoadWCPolyfillsIfNecessary() {
   }
 }
 
-queryInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.keyCode === 13) {
-    doSearch();
+queryInput.addEventListener('input', e => {
+  if (e.target.value.length >= 3) {
+    doSearch().then(results => {
+      // Wait for some results before showing auto complete panel.
+      isSearching = true;
+      toggleAutoComplete();
+    });
+  } else {
+    isSearching = false;
+    toggleAutoComplete();
   }
+});
+
+queryInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.keyCode === 13 ||
+      e.key === 'Escape' || e.keyCode === 2) {
+    queryInput.blur(); // kicks off toggleAutoComplete().
+    if (lastResults.items) {
+      populateResultsPage(lastResults.items);
+    } else {
+      doSearch().then(results => populateResultsPage(results));
+    }
+  }
+});
+
+function toggleAutoComplete() {
+  if (document.activeElement === queryInput && isSearching) {
+    autoComplete.hidden = false;
+  } else {
+    autoComplete.hidden = true;
+  }
+}
+
+queryInput.addEventListener('focus', function() {
+  toggleAutoComplete();
+});
+
+queryInput.addEventListener('blur', function(e) {
+  // If users clicks auto complete result, don't populate page.
+  if (e.relatedTarget) {
+    return;
+  }
+
+  isSearching = false;
+  toggleAutoComplete();
+  populateResultsPage();
+  populateBugStatus(lastResults.items);
 });
 
 const nextButton = document.querySelector('#next-results-button');
@@ -389,7 +454,7 @@ const url = new URL(location);
 const query = url.searchParams.get('q');
 if (query) {
   queryInput.value = query;
-  doSearch();
+  doSearch().then(results => populateResultsPage(results));
 }
 
 if (url.searchParams.has('embed')) {
