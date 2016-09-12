@@ -364,11 +364,13 @@ function lazyLoadWCPolyfillsIfNecessary() {
 
 queryInput.addEventListener('input', e => {
   if (e.target.value.length >= 3) {
-    doSearch().then(results => {
-      // Wait for some results before showing auto complete panel.
-      isSearching = true;
-      toggleAutoComplete();
-    });
+    autoCompleteTemplate.debounce('search', function() {
+      doSearch().then(results => {
+        // Wait for some results before showing auto complete panel.
+        isSearching = true;
+        toggleAutoComplete();
+      });
+    }, 250);
   } else {
     isSearching = false;
     toggleAutoComplete();
