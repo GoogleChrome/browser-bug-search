@@ -415,12 +415,12 @@ queryInput.addEventListener('blur', function(e) {
 
 const nextButton = document.querySelector('#next-results-button');
 nextButton.addEventListener('click', e => {
-  doSearch(nextStartIndex);
+  doSearch(nextStartIndex).then(results => populateResultsPage(results));
 });
 
 const prevButton = document.querySelector('#prev-results-button');
 prevButton.addEventListener('click', e => {
-  doSearch(prevStartIndex);
+  doSearch(prevStartIndex).then(results => populateResultsPage(results));
 });
 
 const filtersEls = document.querySelector('#filters');
