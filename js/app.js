@@ -435,12 +435,18 @@ queryInput.addEventListener('blur', function(e) {
 
 const nextButton = document.querySelector('#next-results-button');
 nextButton.addEventListener('click', e => {
-  doSearch(nextStartIndex).then(results => populateResultsPage());
+  doSearch(nextStartIndex).then(results => {
+    populateResultsPage();
+    populateBugStatus(lastResults.items);
+  });
 });
 
 const prevButton = document.querySelector('#prev-results-button');
 prevButton.addEventListener('click', e => {
-  doSearch(prevStartIndex).then(results => populateResultsPage());
+  doSearch(prevStartIndex).then(results => {
+    populateResultsPage();
+    populateBugStatus(lastResults.items);
+  });
 });
 
 const resetSearchButton = document.querySelector('.search-reset');
@@ -479,7 +485,10 @@ filtersEls.addEventListener('change', e => {
 
   // TODO: don't redo search if there are already results on the page.
   // Just update data model.
-  doSearch().then(results => populateResultsPage());
+  doSearch().then(results => {
+    populateResultsPage();
+    populateBugStatus(lastResults.items);
+  });
 });
 
 function init() {
