@@ -493,7 +493,10 @@ function init() {
     const query = url.searchParams.get('q');
     if (query) {
       queryInput.value = query;
-      doSearch().then(results => populateResultsPage());
+      doSearch().then(results => {
+        populateResultsPage();
+        populateBugStatus(lastResults.items);
+      });
     }
   });
 
