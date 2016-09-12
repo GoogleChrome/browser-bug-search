@@ -9,6 +9,8 @@
   --md-bluegrey-500: #607D8B;
   --md-bluegrey-600: #546e7a;
   --md-bluegrey-700: #455A64;
+
+  --reset-button-size: 24px;
 }
 
 * {
@@ -42,6 +44,7 @@ header h2 {
 }
 #q {
   padding: 8px;
+  padding-right: calc(var(--reset-button-size) + 3px);
   width: 200px;
   font-size: inherit;
   border: 1px solid #ccc;
@@ -96,6 +99,15 @@ label {
   max-width: 700px;
   /*background-color: #fafafa;*/
   /*padding: 32px;*/
+}
+.search-reset {
+  position: absolute;
+  top: 6px;
+  right: 3px;
+  cursor: pointer;
+  height: var(--reset-button-size);
+  width: var(--reset-button-size);
+  opacity: 0.5;
 }
 .search-result {
   margin: 32px 0;

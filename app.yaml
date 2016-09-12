@@ -26,6 +26,10 @@ handlers:
   static_dir: css
   #expiration: 30s
 
+- url: /img
+  static_dir: img
+  #expiration: 30s
+
 - url: /js
   static_dir: js
   #expiration: 30s

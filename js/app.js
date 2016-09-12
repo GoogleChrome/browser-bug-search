@@ -4,6 +4,8 @@
 const CSE_ID = '007435387813601113811:dinkwhm2suk';
 const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 
+const DEBOUNCE_SEARCH = 250; //ms
+
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
 const autoCompleteTemplate = document.querySelector('#autocomplete-results-template');
@@ -30,7 +32,8 @@ const CLOSED_STATUSES = [
 let nextStartIndex;
 let prevStartIndex;
 let lastResults = {};
-let isSearching = false;
+let isSearching = false; // True if the user is typing the search input.
+let _fetching = false; // True when there's an outstanding query to the CSE API.
 
 const filters = {
   includeFixed: filterFixed.checked,
@@ -159,6 +162,10 @@ function getQuery() {
 }
 
 function doSearch(startIndex=null) {
+  if (_fetching) {
+    return Promise.reject('Search already in progress');
+  }
+
   resetUI();
 
   const url = new URL('https://www.googleapis.com/customsearch/v1');
@@ -171,13 +178,18 @@ function doSearch(startIndex=null) {
     url.searchParams.set('start', startIndex);
   }
 
-  return fetch(url)
-      .then(resp => resp.json())
-      .then(json => {
-        lastResults = json;
-        return lastResults;
-      })
-      .then(results => formatResults(results));
+  _fetching = true;
+  return fetch(url).then(resp => resp.json()).then(json => {
+    _fetching = false;
+
+    if (json.error) {
+      throw new Error(json.error.message);
+    }
+    lastResults = json;
+    return lastResults;
+  })
+  .then(results => formatResults(results))
+  .catch(msg => reject(msg));
 }
 
 function updateStatus(status, i) {
@@ -253,6 +265,10 @@ function populateResultsPage() {
 
   updateQueryStats(results);
 
+  if (!results.items) {
+    return;
+  }
+
   searchResults.items = results.items;
 
   if (results.queries.nextPage) {
@@ -316,6 +332,10 @@ function formatResults(results) {
 }
 
 function updateQueryStats(results) {
+  if (!results.searchInformation) {
+    return;
+  }
+
   const totalResults = parseInt(results.searchInformation.totalResults) || 0;
   const startIdx = results.queries.request[0].startIndex || 0;
   const num = results.queries.request[0].count;
@@ -370,7 +390,7 @@ queryInput.addEventListener('input', e => {
         isSearching = true;
         toggleAutoComplete();
       });
-    }, 250);
+    }, DEBOUNCE_SEARCH);
   } else {
     isSearching = false;
     toggleAutoComplete();
@@ -381,10 +401,11 @@ queryInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.keyCode === 13 ||
       e.key === 'Escape' || e.keyCode === 2) {
     queryInput.blur(); // kicks off toggleAutoComplete().
-    if (lastResults.items) {
-      populateResultsPage(lastResults.items);
-    } else {
-      doSearch().then(results => populateResultsPage(results));
+    if (!lastResults.items) {
+      doSearch().then(results => {
+        populateResultsPage();
+        populateBugStatus(lastResults.items);
+      });
     }
   }
 });
@@ -410,18 +431,27 @@ queryInput.addEventListener('blur', function(e) {
   isSearching = false;
   toggleAutoComplete();
   populateResultsPage();
-  populateBugStatus(lastResults.items);
 });
 
 const nextButton = document.querySelector('#next-results-button');
 nextButton.addEventListener('click', e => {
-  doSearch(nextStartIndex).then(results => populateResultsPage(results));
+  doSearch(nextStartIndex).then(results => populateResultsPage());
 });
 
 const prevButton = document.querySelector('#prev-results-button');
 prevButton.addEventListener('click', e => {
-  doSearch(prevStartIndex).then(results => populateResultsPage(results));
+  doSearch(prevStartIndex).then(results => populateResultsPage());
 });
+
+const resetSearchButton = document.querySelector('.search-reset');
+resetSearchButton.addEventListener('click', e => {
+  queryInput.value = null;
+  resetUI();
+  const url = new URL(location);
+  url.searchParams.delete('q');
+  history.pushState({}, '', url);
+});
+
 
 const filtersEls = document.querySelector('#filters');
 filtersEls.addEventListener('change', e => {
@@ -449,20 +479,27 @@ filtersEls.addEventListener('change', e => {
 
   // TODO: don't redo search if there are already results on the page.
   // Just update data model.
-  doSearch().then(results => populateResultsPage(results));
+  doSearch().then(results => populateResultsPage());
 });
 
-const url = new URL(location);
-const query = url.searchParams.get('q');
-if (query) {
-  queryInput.value = query;
-  doSearch().then(results => populateResultsPage(results));
+function init() {
+  const url = new URL(location);
+
+  if (url.searchParams.has('embed')) {
+    document.documentElement.classList.add('embed');
+  }
+
+  document.querySelector('link[rel="import"]').addEventListener('load', e => {
+    const query = url.searchParams.get('q');
+    if (query) {
+      queryInput.value = query;
+      doSearch().then(results => populateResultsPage());
+    }
+  });
+
+  lazyLoadWCPolyfillsIfNecessary();
 }
 
-if (url.searchParams.has('embed')) {
-  document.documentElement.classList.add('embed');
-}
-
-lazyLoadWCPolyfillsIfNecessary();
+init();
 
 })(window);
