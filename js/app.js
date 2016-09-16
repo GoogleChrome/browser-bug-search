@@ -514,7 +514,7 @@ function init() {
     document.documentElement.classList.add('embed');
   }
 
-  document.querySelector('link[rel="import"]').addEventListener('load', e => {
+  const doDeepLink = function() {
     const query = url.searchParams.get('q');
     if (query) {
       queryInput.value = query;
@@ -523,9 +523,16 @@ function init() {
         populateBugStatus(lastResults.items);
       });
     }
-  });
+  };
 
-  lazyLoadWCPolyfillsIfNecessary();
+  const htmlImport = document.querySelector('link[rel="import"]');
+  if (htmlImport) {
+    htmlImport.addEventListener('load', doDeepLink);
+  } else {
+    doDeepLink();
+  }
+
+  //lazyLoadWCPolyfillsIfNecessary();
 }
 
 init();
