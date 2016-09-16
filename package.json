@@ -1,0 +1,27 @@
+{
+  "name": "browser-issue-tracker",
+  "version": "0.0.1",
+  "description": "Search across all major browser vendor issue trackers",
+  "main": "index.html",
+  "scripts": {
+    "build": "./node_modules/vulcanize/bin/vulcanize --inline-css --inline-scripts --strip-comments bower_components/polymer/polymer.html -o bower_components/polymer/polymer.vulcanized.html",
+    "deploy": "npm run build; appcfg.py update ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GoogleChrome/browser-bug-search.git"
+  },
+  "keywords": [
+    "browser",
+    "search"
+  ],
+  "author": "Eric Bidelman <ebidel@>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/GoogleChrome/browser-bug-search/issues"
+  },
+  "homepage": "https://github.com/GoogleChrome/browser-bug-search#readme",
+  "devDependencies": {
+    "vulcanize": "^1.14.8"
+  }
+}
