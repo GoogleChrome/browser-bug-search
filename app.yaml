@@ -1,5 +1,5 @@
 application: browser-issue-tracker-search
-version: 1
+version: 2
 runtime: python27
 threadsafe: true
 api_version: 1
@@ -34,9 +34,13 @@ handlers:
   static_dir: js
   #expiration: 30s
 
-- url: /bower_components/polymer/polymer.html
-  static_files: bower_components/polymer/polymer.vulcanized.html
-  upload: bower_components/polymer/polymer.vulcanized.html
+- url: /deps.html
+  static_files: deps.vulcanized.html
+  upload: deps.vulcanized.html
+
+#- url: /bower_components/polymer/polymer.html
+#  static_files: bower_components/polymer/polymer.vulcanized.html
+#  upload: bower_components/polymer/polymer.vulcanized.html
 
 - url: /bower_components
   static_dir: bower_components
@@ -68,3 +72,5 @@ skip_files:
 - ^http2push/example
 - ^http2push/site
 - ^static/sass
+- ^.*Makefile
+- ^bower_components/url-search-params/template/.*

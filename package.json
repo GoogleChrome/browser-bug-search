@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "postinstall": "npm run deps; npm run build",
-    "build": "./node_modules/vulcanize/bin/vulcanize --inline-css --inline-scripts --strip-comments bower_components/polymer/polymer.html -o bower_components/polymer/polymer.vulcanized.html",
+    "build": "./node_modules/vulcanize/bin/vulcanize --inline-css --inline-scripts --strip-comments deps.html -o deps.vulcanized.html",
     "deploy": "npm run build; appcfg.py update .",
     "deps": "rm -rf bower_components; bower install"
   },
