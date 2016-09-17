@@ -34,9 +34,13 @@ handlers:
   static_dir: js
   #expiration: 30s
 
-- url: /deps.html
+- url: /deps.vulcanized.html
   static_files: deps.vulcanized.html
   upload: deps.vulcanized.html
+
+- url: /deps.vulcanized.js
+  static_files: deps.vulcanized.js
+  upload: deps.vulcanized.js
 
 #- url: /bower_components/polymer/polymer.html
 #  static_files: bower_components/polymer/polymer.vulcanized.html

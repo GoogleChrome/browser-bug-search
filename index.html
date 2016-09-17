@@ -26,7 +26,7 @@ limitations under the License.
 <!-- <link rel="icon" sizes="192x192" href="/static/img/crstatus_192.png"> -->
 
 <link rel="stylesheet" href="/css/app.css">
-<link rel="import" href="deps.html" async>
+<link rel="import" href="deps.vulcanized.html" async>
 </head>
 <body>
 
@@ -43,8 +43,8 @@ limitations under the License.
     <input id="q" type="text" placeholder="CSS flexbox" autocomplete="off">
     <img src="/img/close_48px.svg" alt="Reset search" class="search-reset">
     <div id="autocomplete-results" hidden>
-      <dom-repeat id="autocomplete-results-template">
-        <template>
+      <!-- <dom-repeat id="autocomplete-results-template"> -->
+        <template id="autocomplete-results-template" is="dom-repeat">
           <div class="autocomplete-result">
             <div class="layout horizontal center">
               <span class="autocomplete-browser">[[[item.browser]]]</span>
@@ -76,8 +76,8 @@ limitations under the License.
 </h2>
 
 <div id="search-results">
-  <dom-repeat id="search-results-template">
-    <template>
+  <!-- <dom-repeat id="search-results-template"> -->
+    <template id="search-results-template" is="dom-repeat">
       <div class="search-result" faded$="[[item.filterOut]]">
         <div class="layout horizontal center">
           <span class="search-result-vendor">[[[item.browser]]]</span>
@@ -87,12 +87,12 @@ limitations under the License.
         <p class="snippet">[[item.snippet]]</p>
       </div>
     </template>
-  </dom-repeat>
+  <!-- </dom-repeat> -->
 </div>
 
 <script src="/bower_components/url-search-params/build/url-search-params.js" async></script>
-<script src="/bower_components/custom-elements/custom-elements.min.js" async></script>
-<script src="/js/app.js" async></script>
+<!-- <script src="/bower_components/custom-elements/custom-elements.min.js" async></script> -->
+<script src="/js/app.min.js" async></script>
 <script>
 // Analytics
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

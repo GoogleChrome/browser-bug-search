@@ -15,7 +15,8 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#2.0-preview",
+    "polymer2": "Polymer/polymer#2.0-preview",
+    "polymer": "Polymer/polymer",
     "url-search-params": "WebReflection/url-search-params#^0.6.0",
     "custom-elements": "webcomponents/custom-elements#^1.0.0-alpha.3"
   }

@@ -185,14 +185,19 @@ function doSearch(startIndex=null) {
   resetUI();
 
   const url = new URL('https://www.googleapis.com/customsearch/v1');
-  url.searchParams.set('q', getQuery());
-  url.searchParams.set('key', API_KEY);
-  url.searchParams.set('cx', CSE_ID);
-  // url.searchParams.append('excludeTerms', 'Status: Fixed');
+
+  // Can't use url.searchParams b/c Safari doesn't support it.
+  const params = new URLSearchParams(); // url.searchParams;
+  params.set('q', getQuery());
+  params.set('key', API_KEY);
+  params.set('cx', CSE_ID);
+  // params.append('excludeTerms', 'Status: Fixed');
 
   if (startIndex) {
-    url.searchParams.set('start', startIndex);
+    params.set('start', startIndex);
   }
+
+  url.search = params.toString();
 
   _fetching = true;
   return fetch(url).then(resp => resp.json()).then(json => {
@@ -302,7 +307,8 @@ function populateResultsPage() {
   }
 
   let url = `?q=${queryInput.value}`;
-  if ((new URL(location)).searchParams.has('embed')) {
+  const params = new URLSearchParams(location.search);
+  if (params.has('embed')) {
     url += '&embed';
   }
   history.pushState({}, '', url);
@@ -510,12 +516,14 @@ filtersEls.addEventListener('change', e => {
 function init() {
   const url = new URL(location);
 
-  if (url.searchParams.has('embed')) {
+  // Can't use url.searchParams b/c Safari doesn't support it.
+  const params = new URLSearchParams(url.search);
+  if (params.has('embed')) {
     document.documentElement.classList.add('embed');
   }
 
   const doDeepLink = function() {
-    const query = url.searchParams.get('q');
+    const query = params.get('q');
     if (query) {
       queryInput.value = query;
       doSearch().then(results => {
@@ -532,7 +540,7 @@ function init() {
     doDeepLink();
   }
 
-  //lazyLoadWCPolyfillsIfNecessary();
+  lazyLoadWCPolyfillsIfNecessary();
 }
 
 init();
