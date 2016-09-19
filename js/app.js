@@ -20,7 +20,7 @@
 const CSE_ID = '007435387813601113811:dinkwhm2suk';
 const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 
-const DEBOUNCE_SEARCH = 250; //ms
+const DEBOUNCE_SEARCH = 350; //ms
 
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
