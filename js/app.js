@@ -36,14 +36,23 @@ const domains_to_browser = {
   'bugs.webkit.org': 'WebKit'
 };
 
-const STATUS = ['RESOLVED', 'VERIFIED', 'CLOSED'];
-const RES = [ 'FIXED', 'WONTFIX', 'DUPLICATE',];
-const CLOSED_STATUSES = STATUS.concat(RES);
-STATUS.forEach((status) => {
-  RES.forEach((res) => {
-    CLOSED_STATUSES.push(status + ' ' + res);
-  });
-});
+const CLOSED_STATUSES = [
+  'RESOLVED',
+  'VERIFIED',
+  'CLOSED',
+  'FIXED',
+  'WONTFIX',
+  'DUPLICATE',
+  'RESOLVED FIXED',
+  'RESOLVED WONTFIX',
+  'RESOLVED DUPLICATE',
+  'VERIFIED FIXED',
+  'VERIFIED WONTFIX',
+  'VERIFIED DUPLICATE',
+  'CLOSED FIXED',
+  'CLOSED WONTFIX',
+  'CLOSED DUPLICATE'
+];
 
 let nextStartIndex;
 let prevStartIndex;
