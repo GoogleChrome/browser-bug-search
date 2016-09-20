@@ -121,8 +121,7 @@ label {
 #search-results {
   min-height: 400px;
   max-width: 700px;
-  /*background-color: #fafafa;*/
-  /*padding: 32px;*/
+  margin-bottom: calc(64px + 32px); /* footer + padding */
 }
 .search-reset {
   position: absolute;
