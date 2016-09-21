@@ -142,23 +142,14 @@ class MozillaBug extends Bug {
   }
 
   fetchPage(url=this.url) {
-    let match = url.match(/\?id=(.*)$/);
+    let match = url.match(/\?id=(.+)$/);
     if (!match) {
-      return Promise.reject('Could not find Mozilla bug id.');
+      return Promise.reject('Could not find bug id Mozilla bug link.');
     }
 
     url = `${MozillaBug.BUG_PREFIX}${match[1]}`;
 
-    return new Promise(function(resolve, reject) {
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = 'json';
-      xhr.open('GET', url, true);
-      xhr.onload = function(e) {
-        resolve(e.target.response);
-      };
-      xhr.onerror = reject;
-      xhr.send();
-    });
+    return fetch(url).then(resp => resp.json());
   }
 
   findStatus(json) {
@@ -279,7 +270,7 @@ function populateBugStatus(items) {
       case 'Mozilla':
         let mozillaBug = new MozillaBug(item.link);
         var p = mozillaBug.fetchPage().then(json => mozillaBug.findStatus(json)).then(status => {
-          status = status.toUpperCase();//.replace(/RESOLVED(.*)?/, 'FIXED');
+          status = status.toUpperCase();
           updateStatus(status, i);
         });
 
@@ -289,7 +280,7 @@ function populateBugStatus(items) {
       case 'WebKit':
         let webkitBug = new WebKitBug(item.link);
         var p = webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
-          status = status.toUpperCase();//.replace('RESOLVED FIXED', 'FIXED');
+          status = status.toUpperCase();
           updateStatus(status, i);
         });
 
