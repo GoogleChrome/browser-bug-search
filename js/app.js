@@ -131,18 +131,38 @@ class WebKitBug extends Bug {
 }
 
 class MozillaBug extends Bug {
-  constructor(url) {
-    super(url);
-    this.needsCors = true;
+
+  static get BUG_PREFIX() {
+    return 'https://bugzilla.mozilla.org/rest/bug/';
   }
 
-  findStatus(doc) {
-    const statusEl = doc.querySelector('#static_bug_status');
-    if (statusEl) {
-      return statusEl.textContent.replace('\n', '')
-                                 .replace(/ +(?=)/g, ' ').trim();
+  constructor(url) {
+    super(url);
+    this.needsCors = false;
+  }
+
+  fetchPage(url=this.url) {
+    let match = url.match(/\?id=(.*)$/);
+    if (!match) {
+      return Promise.reject('Could not find Mozilla bug id.');
     }
-    return '';
+
+    url = `${MozillaBug.BUG_PREFIX}${match[1]}`;
+
+    return new Promise(function(resolve, reject) {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'json';
+      xhr.open('GET', url, true);
+      xhr.onload = function(e) {
+        resolve(e.target.response);
+      };
+      xhr.onerror = reject;
+      xhr.send();
+    });
+  }
+
+  findStatus(json) {
+    return json.bugs[0].status;
   }
 }
 
@@ -258,7 +278,7 @@ function populateBugStatus(items) {
         break;
       case 'Mozilla':
         let mozillaBug = new MozillaBug(item.link);
-        var p = mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
+        var p = mozillaBug.fetchPage().then(json => mozillaBug.findStatus(json)).then(status => {
           status = status.toUpperCase();//.replace(/RESOLVED(.*)?/, 'FIXED');
           updateStatus(status, i);
         });
