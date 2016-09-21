@@ -131,18 +131,29 @@ class WebKitBug extends Bug {
 }
 
 class MozillaBug extends Bug {
-  constructor(url) {
-    super(url);
-    this.needsCors = true;
+
+  static get BUG_PREFIX() {
+    return 'https://bugzilla.mozilla.org/rest/bug/';
   }
 
-  findStatus(doc) {
-    const statusEl = doc.querySelector('#static_bug_status');
-    if (statusEl) {
-      return statusEl.textContent.replace('\n', '')
-                                 .replace(/ +(?=)/g, ' ').trim();
+  constructor(url) {
+    super(url);
+    this.needsCors = false;
+  }
+
+  fetchPage(url=this.url) {
+    let match = url.match(/\?id=(.+)$/);
+    if (!match) {
+      return Promise.reject('Could not find bug id Mozilla bug link.');
     }
-    return '';
+
+    url = `${MozillaBug.BUG_PREFIX}${match[1]}`;
+
+    return fetch(url).then(resp => resp.json());
+  }
+
+  findStatus(json) {
+    return json.bugs[0].status;
   }
 }
 
@@ -258,8 +269,8 @@ function populateBugStatus(items) {
         break;
       case 'Mozilla':
         let mozillaBug = new MozillaBug(item.link);
-        var p = mozillaBug.fetchPage().then(doc => mozillaBug.findStatus(doc)).then(status => {
-          status = status.toUpperCase();//.replace(/RESOLVED(.*)?/, 'FIXED');
+        var p = mozillaBug.fetchPage().then(json => mozillaBug.findStatus(json)).then(status => {
+          status = status.toUpperCase();
           updateStatus(status, i);
         });
 
@@ -269,7 +280,7 @@ function populateBugStatus(items) {
       case 'WebKit':
         let webkitBug = new WebKitBug(item.link);
         var p = webkitBug.fetchPage().then(doc => webkitBug.findStatus(doc)).then(status => {
-          status = status.toUpperCase();//.replace('RESOLVED FIXED', 'FIXED');
+          status = status.toUpperCase();
           updateStatus(status, i);
         });
 
