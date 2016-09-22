@@ -25,33 +25,45 @@ handlers:
 - url: /css
   static_dir: css
   #expiration: 30s
+  secure: always
 
 - url: /img
   static_dir: img
   #expiration: 30s
+  secure: always
 
 - url: /js
   static_dir: js
   #expiration: 30s
+  secure: always
 
 - url: /deps.vulcanized.html
   static_files: deps.vulcanized.html
   upload: deps.vulcanized.html
+  secure: always
 
 - url: /deps.vulcanized.js
   static_files: deps.vulcanized.js
   upload: deps.vulcanized.js
+  secure: always
 
 #- url: /bower_components/polymer/polymer.html
 #  static_files: bower_components/polymer/polymer.vulcanized.html
 #  upload: bower_components/polymer/polymer.vulcanized.html
+#  secure: always
 
 - url: /bower_components
   static_dir: bower_components
+  secure: always
+
+- url: /cors
+  script: main.app
+  secure: always
 
 - url: /
   static_files: index.html
   upload: index\.html
+  secure: always
 
 skip_files:
 - ^(.*/)?app\.yaml

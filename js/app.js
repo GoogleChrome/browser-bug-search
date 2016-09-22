@@ -75,12 +75,12 @@ class Bug {
   }
 
   static get CORS_PREFIX() {
-    return 'https://crossorigin.me';
+    return '/cors?url=';
   }
 
   fetchPage(url=this.url) {
     if (this.needsCors) {
-      url = `${Bug.CORS_PREFIX}/${url}`;
+      url = `${Bug.CORS_PREFIX}${url}`;
     }
 
     return new Promise(function(resolve, reject) {
@@ -150,7 +150,7 @@ class MozillaBug extends Bug {
     url = `${MozillaBug.BUG_PREFIX}${match[1]}`;
 
     if (this.needsCors) {
-      url = `${MozillaBug.CORS_PREFIX}/${url}`;
+      url = `${MozillaBug.CORS_PREFIX}${url}`;
     }
 
     return fetch(url).then(resp => resp.json());
@@ -181,7 +181,7 @@ class EdgeBug extends Bug {
     url = `${EdgeBug.BUG_PREFIX}${match[1]}`;
 
     if (this.needsCors) {
-      url = `${EdgeBug.CORS_PREFIX}/${url}`;
+      url = `${EdgeBug.CORS_PREFIX}${url}`;
     }
 
     return fetch(url).then(resp => resp.json());
