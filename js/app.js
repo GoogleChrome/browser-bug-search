@@ -144,10 +144,14 @@ class MozillaBug extends Bug {
   fetchPage(url=this.url) {
     let match = url.match(/\?id=(.+)$/);
     if (!match) {
-      return Promise.reject('Could not find bug id Mozilla bug link.');
+      return Promise.reject('Could not find bug id in Mozilla bug link.');
     }
 
     url = `${MozillaBug.BUG_PREFIX}${match[1]}`;
+
+    if (this.needsCors) {
+      url = `${MozillaBug.CORS_PREFIX}/${url}`;
+    }
 
     return fetch(url).then(resp => resp.json());
   }
@@ -158,18 +162,33 @@ class MozillaBug extends Bug {
 }
 
 class EdgeBug extends Bug {
+
+  static get BUG_PREFIX() {
+    return 'https://developer.microsoft.com/en-us/microsoft-edge/api/platform/issues/search/?q=id%3A';
+  }
+
   constructor(url) {
     super(url);
     this.needsCors = true;
   }
 
-  findStatus(doc) {
-    const statusEl = doc.querySelector('.bug-status');
-    if (statusEl) {
-      return statusEl.textContent.replace('\n', '')
-                                 .replace(/ +(?=)/g, ' ').trim();
+  fetchPage(url=this.url) {
+    let match = url.match(/\/(\d+)\/$/);
+    if (!match) {
+      return Promise.reject('Could not find bug id in Edge bug link.');
     }
-    return '';
+
+    url = `${EdgeBug.BUG_PREFIX}${match[1]}`;
+
+    if (this.needsCors) {
+      url = `${EdgeBug.CORS_PREFIX}/${url}`;
+    }
+
+    return fetch(url).then(resp => resp.json());
+  }
+
+  findStatus(json) {
+    return json.bugs[0].status;
   }
 }
 
