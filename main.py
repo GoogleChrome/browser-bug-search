@@ -44,7 +44,7 @@ class MainPage(webapp2.RequestHandler):
       if result.status_code == 200:
         DEFAULT_TYPE = 'application/json; charset=utf-8'
 
-        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        #self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = (
             result.headers['Content-Type'] or DEFAULT_TYPE)
 
