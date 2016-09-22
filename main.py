@@ -30,9 +30,12 @@ DEBUG = not os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/')
 class MainPage(webapp2.RequestHandler):
 
   def get(self):
+    origin = 'https://%s' % self.request.environ['HTTP_HOST']
+
     if not DEBUG:
-      if self.request.referer and not self.request.url in self.request.referer:
-        return
+      if self.request.referer and not self.request.referer.startswith(origin):
+        self.response.set_status(400)
+        return self.response.write('No referer set.')
 
     url = self.request.get('url')
     if not url:
