@@ -20,5 +20,5 @@
     "url-search-params": "WebReflection/url-search-params#^0.6.0",
     "custom-elements": "webcomponents/custom-elements#^1.0.0-alpha.3",
     "fetch": "^1.0.0"
-  },
+  }
 }
