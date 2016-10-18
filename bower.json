@@ -5,7 +5,7 @@
   ],
   "description": "Search across all major browser issue trackers.",
   "main": "",
-  "license": "Apcache-2",
+  "license": "Apache-2.0",
   "homepage": "https://browser-issue-tracker-search.appspot.com",
   "ignore": [
     "**/.*",
