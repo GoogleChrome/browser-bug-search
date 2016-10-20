@@ -60,7 +60,6 @@ const CLOSED_STATUSES = [
 let nextStartIndex = null;
 let prevStartIndex = null;
 let lastResults = {};
-let isSearching = false; // True if the user is typing the search input.
 let _fetching = false; // True when there's an outstanding query to the CSE API.
 let selectedAutoCompleteItem = -1;
 
@@ -463,12 +462,10 @@ queryInput.addEventListener('input', e => {
     autoCompleteTemplate.debounce('search', function() {
       doSearch().then(results => {
         // Wait for some results before showing auto complete panel.
-        isSearching = true;
         toggleAutoComplete();
       });
     }, DEBOUNCE_SEARCH);
   } else {
-    isSearching = false;
     toggleAutoComplete();
   }
 });
@@ -491,7 +488,7 @@ queryInput.addEventListener('keydown', e => {
 });
 
 function toggleAutoComplete() {
-  if (document.activeElement === queryInput && isSearching) {
+  if (EMBED && document.activeElement === queryInput && lastResults.items) {
     autoComplete.hidden = false;
   } else {
     autoComplete.hidden = true;
@@ -542,7 +539,6 @@ queryInput.addEventListener('blur', function(e) {
     return;
   }
 
-  isSearching = false;
   toggleAutoComplete();
   populateResultsPage();
 });
@@ -573,6 +569,9 @@ const resetSearchButton = document.querySelector('.search-reset');
 resetSearchButton.addEventListener('click', e => {
   queryInput.value = null;
   resetUI();
+  // clear auto complete results outside of resetUI() b/c we don't want to
+  // nuke the results as users type into the search box.
+  autoCompleteTemplate.items = [];
   const url = new URL(location);
   url.searchParams.delete('q');
   history.pushState({}, '', url);

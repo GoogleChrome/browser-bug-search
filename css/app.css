@@ -206,15 +206,6 @@ label {
 .query-term {
   color: var(--md-blue-600);
 }
-.embed body {
-  margin: 0;
-}
-.embed header {
-  display: none
-}
-.embed #search-section > .next-buttons {
-  display: none;
-}
 
 footer {
   display: flex;
@@ -242,10 +233,6 @@ footer a {
   color: currentColor;
 }
 
-.embed footer {
-  display: none;
-}
-
 .browser-logo {
   background: url("/img/browsers-logos.png") no-repeat 0% 50%;
   background-size: cover;
@@ -265,6 +252,26 @@ footer a {
 }
 .browser-logo.Edge {
   background-position: -80px 50%;
+}
+
+.embed body {
+  margin: 0;
+  padding: 0;
+}
+.embed header,
+.embed footer {
+  display: none;
+}
+.embed #search-section {
+  margin: 0;
+}
+.embed #search-section > .next-buttons {
+  display: none;
+}
+.embed #search-results,
+.embed #filters,
+.embed #query-results {
+  display: none;
 }
 
 @media (max-width: 599px) {
