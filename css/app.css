@@ -98,7 +98,7 @@ header h2 {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
 }
 .autocomplete-result .search-result-status {
   padding: 0 4px;

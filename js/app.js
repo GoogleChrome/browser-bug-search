@@ -272,7 +272,7 @@ function updateStatus(status, i) {
 function populateBugStatuses(items) {
   const promises = [];
 
-  if (!items.length) {
+  if (!items || !items.length) {
     return;
   }
 
@@ -487,8 +487,9 @@ queryInput.addEventListener('keydown', e => {
   }
 });
 
-function toggleAutoComplete() {
-  if (EMBED && document.activeElement === queryInput && lastResults.items) {
+function toggleAutoComplete(forceOpen=false) {
+  if (EMBED && document.activeElement === queryInput && lastResults.items ||
+      EMBED && forceOpen) {
     autoComplete.hidden = false;
   } else {
     autoComplete.hidden = true;
@@ -619,7 +620,9 @@ function init() {
     const query = params.get('q');
     if (query) {
       queryInput.value = query;
-      doSearch();
+      doSearch().then(results => {
+        toggleAutoComplete(true);
+      });
     }
   };
 
