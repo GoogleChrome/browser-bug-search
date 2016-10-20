@@ -42,23 +42,31 @@ limitations under the License.
   <div id="search-container">
     <input id="q" type="text" placeholder="e.g. CSS flexbox" autocomplete="off">
     <img src="/img/close_48px.svg" alt="Reset search" class="search-reset">
-    <div id="autocomplete-results" hidden>
-      <!-- <dom-repeat id="autocomplete-results-template"> -->
-        <template id="autocomplete-results-template" is="dom-repeat">
-          <div class="autocomplete-result">
-            <div class="layout horizontal center">
-              <span class="autocomplete-browser">[[[item.browser]]]</span>
-              <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
+    <div id="autocomplete-results" role="listbox" hidden>
+      <template id="autocomplete-results-template" is="dom-repeat">
+        <a href$="[[item.link]]" target="_blank" rel="noopener"
+           class="autocomplete-result" tabindex="0" role="option">
+          <div class="layout horizontal center">
+            <div class="autocomplete-result-title layout horizontal center">
+              <span class$="browser-logo [[item.browser]]"></span>
+              <span>[[item.title]]</span>
             </div>
+            <span class="search-result-status" invisible$="[[!item.status]]">[[item.status]]</span>
           </div>
-        </template>
-      <dom-repeat>
-      <div class="autocomplete-hint">Hit "Enter" to see full page results</div>
+        </a>
+      </template>
+      <div id="autocomplete-footer" class="layout horizontal center">
+        <div class="layout horizontal next-buttons">
+          <button class="prev-results-button" disabled>&laquo; Prev</button>
+          <button class="next-results-button">Next &raquo;</button>
+        </div>
+        <div class="autocomplete-hint">See all results.</div>
+      </div>
     </div>
   </div>
   <div class="layout horizontal next-buttons">
-    <button id="prev-results-button" disabled>&laquo; Prev</button>
-    <button id="next-results-button" disabled>Next &raquo;</button>
+    <button class="prev-results-button" disabled>&laquo; Prev</button>
+    <button class="next-results-button" disabled>Next &raquo;</button>
   </div>
 </div>
 
@@ -76,18 +84,16 @@ limitations under the License.
 </h2>
 
 <div id="search-results">
-  <!-- <dom-repeat id="search-results-template"> -->
     <template id="search-results-template" is="dom-repeat">
       <div class="search-result" faded$="[[item.filterOut]]">
         <div class="layout horizontal center">
-          <span class="search-result-vendor">[[[item.browser]]]</span>
+          <span class$="browser-logo [[item.browser]]"></span>
           <a href="[[item.link]]" target="_blank" rel="noopener">[[item.title]]</a>
           <span class="search-result-status" invisible$="[[!item.status]]">[[item.status]]</span>
         </div>
         <p class="snippet">[[item.snippet]]</p>
       </div>
     </template>
-  <!-- </dom-repeat> -->
 </div>
 
 <footer>

@@ -22,6 +22,9 @@ const API_KEY = 'AIzaSyBHc09TGSyYSK63bUt8wbXtiySDV9PjDZg';
 
 const DEBOUNCE_SEARCH = 350; //ms
 
+// Can't use url.searchParams b/c Safari doesn't support it.
+const EMBED = (new URLSearchParams(location.search)).has('embed');
+
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
 const autoCompleteTemplate = document.querySelector('#autocomplete-results-template');
@@ -54,11 +57,12 @@ const CLOSED_STATUSES = [
   'CLOSED DUPLICATE'
 ];
 
-let nextStartIndex;
-let prevStartIndex;
+let nextStartIndex = null;
+let prevStartIndex = null;
 let lastResults = {};
 let isSearching = false; // True if the user is typing the search input.
 let _fetching = false; // True when there's an outstanding query to the CSE API.
+let selectedAutoCompleteItem = -1;
 
 const filters = {
   fadeFixed: fadeFixed.checked,
@@ -226,7 +230,7 @@ function doSearch(startIndex=null) {
   const url = new URL('https://www.googleapis.com/customsearch/v1');
 
   // Can't use url.searchParams b/c Safari doesn't support it.
-  const params = new URLSearchParams(); // url.searchParams;
+  const params = new URLSearchParams();
   params.set('q', getQuery());
   params.set('key', API_KEY);
   params.set('cx', CSE_ID);
@@ -248,20 +252,30 @@ function doSearch(startIndex=null) {
     lastResults = json;
     return lastResults;
   })
-  .then(results => formatResults(results))
-  .catch(msg => reject(msg));
+  .then(results => {
+    formatResults(results);
+    populateResultsPage();
+    populateBugStatuses(results.items);
+  })
+  .catch(msg => Promise.reject(msg));
 }
 
 function updateStatus(status, i) {
   searchResults.set(`items.${i}.status`, status);
+  autoCompleteTemplate.set(`items.${i}.status`, status);
 
   if (filters.fadeFixed && CLOSED_STATUSES.includes(status)) {
     searchResults.set(`items.${i}.filterOut`, true);
+    autoCompleteTemplate.set(`items.${i}.filterOut`, true);
   }
 }
 
-function populateBugStatus(items) {
+function populateBugStatuses(items) {
   const promises = [];
+
+  if (!items.length) {
+    return;
+  }
 
   items.map(function(item, i) {
     switch (item.browser) {
@@ -318,6 +332,8 @@ function populateBugStatus(items) {
   //   //   }
   //   // });
   // });
+
+  return promises;
 }
 
 function populateResultsPage() {
@@ -330,24 +346,26 @@ function populateResultsPage() {
   }
 
   searchResults.items = results.items;
+  autoCompleteTemplate.items = searchResults.items.slice(0, 6);
 
   if (results.queries.nextPage) {
-    nextButton.disabled = false;
+    updateNextButtons(false);
     nextStartIndex = results.queries.nextPage[0].startIndex;
   } else {
-    nextButton.disabled = true;
+    updateNextButtons(true);
+    nextStartIndex = null;
   }
 
   if (results.queries.previousPage) {
-    prevButton.disabled = false;
+    updatePrevButtons(false);
     prevStartIndex = results.queries.previousPage[0].startIndex;
   } else {
-    prevButton.disabled = true;
+    updatePrevButtons(true);
+    prevStartIndex = null;
   }
 
   let url = `?q=${queryInput.value}`;
-  const params = new URLSearchParams(location.search);
-  if (params.has('embed')) {
+  if (EMBED) {
     url += '&embed';
   }
   history.pushState({}, '', url);
@@ -386,9 +404,6 @@ function formatResults(results) {
     }
   });
 
-  autoCompleteTemplate.items = items.slice(0, 5);
-  autoComplete.removeAttribute('invisible');
-
   return results;
 }
 
@@ -413,8 +428,8 @@ function updateQueryStats(results) {
 function resetUI() {
   queryResults.hidden = true;
   searchResults.items = [];
-  nextButton.disabled = true;
-  prevButton.disabled = true;
+  updateNextButtons(true);
+  updatePrevButtons(true);
   lastResults = {};
 }
 
@@ -459,14 +474,18 @@ queryInput.addEventListener('input', e => {
 });
 
 queryInput.addEventListener('keydown', e => {
+  if (e.code === 'ArrowDown') {
+    const firstItem = autoComplete.querySelector('.autocomplete-result');
+    selectedAutoCompleteItem = 0;
+    firstItem.focus();
+    return;
+  }
+
   if (e.key === 'Enter' || e.keyCode === 13 ||
       e.key === 'Escape' || e.keyCode === 2) {
     queryInput.blur(); // kicks off toggleAutoComplete().
     if (!lastResults.items) {
-      doSearch().then(results => {
-        populateResultsPage();
-        populateBugStatus(lastResults.items);
-      });
+      doSearch();
     }
   }
 });
@@ -478,6 +497,40 @@ function toggleAutoComplete() {
     autoComplete.hidden = true;
   }
 }
+
+autoComplete.addEventListener('keydown', e => {
+  const items = autoComplete.querySelectorAll('.autocomplete-result');
+
+  switch (e.code) {
+    case 'ArrowUp':
+      e.preventDefault();
+      selectedAutoCompleteItem -= 1;
+      selectedAutoCompleteItem = (
+          selectedAutoCompleteItem < 0 ? items.length - 1 :
+          selectedAutoCompleteItem);
+      items[selectedAutoCompleteItem].focus();
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      selectedAutoCompleteItem = (selectedAutoCompleteItem + 1) % items.length;
+      items[selectedAutoCompleteItem].focus();
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      if (prevStartIndex !== null) {
+        doSearch(prevStartIndex);
+      }
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      if (nextStartIndex !== null) {
+        doSearch(nextStartIndex);
+      }
+      break;
+    default:
+      break;
+  }
+});
 
 queryInput.addEventListener('focus', function() {
   toggleAutoComplete();
@@ -494,21 +547,27 @@ queryInput.addEventListener('blur', function(e) {
   populateResultsPage();
 });
 
-const nextButton = document.querySelector('#next-results-button');
-nextButton.addEventListener('click', e => {
-  doSearch(nextStartIndex).then(results => {
-    populateResultsPage();
-    populateBugStatus(lastResults.items);
+const nextButtons = Array.from(document.querySelectorAll('.next-results-button'));
+nextButtons.forEach(nextButton => {
+ nextButton.addEventListener('click', e => {
+    doSearch(nextStartIndex);
   });
 });
 
-const prevButton = document.querySelector('#prev-results-button');
-prevButton.addEventListener('click', e => {
-  doSearch(prevStartIndex).then(results => {
-    populateResultsPage();
-    populateBugStatus(lastResults.items);
+const prevButtons = Array.from(document.querySelectorAll('.prev-results-button'));
+prevButtons.forEach(prevButton => {
+  prevButton.addEventListener('click', e => {
+    doSearch(prevStartIndex);
   });
 });
+
+function updateNextButtons(disabled) {
+  nextButtons.forEach(nextButton => nextButton.disabled = disabled);
+}
+
+function updatePrevButtons(disabled) {
+  prevButtons.forEach(prevButton => prevButton.disabled = disabled);
+}
 
 const resetSearchButton = document.querySelector('.search-reset');
 resetSearchButton.addEventListener('click', e => {
@@ -546,29 +605,22 @@ filtersEls.addEventListener('change', e => {
 
   // TODO: don't redo search if there are already results on the page.
   // Just update data model.
-  doSearch().then(results => {
-    populateResultsPage();
-    populateBugStatus(lastResults.items);
-  });
+  doSearch();
 });
 
 function init() {
   const url = new URL(location);
 
-  // Can't use url.searchParams b/c Safari doesn't support it.
-  const params = new URLSearchParams(url.search);
-  if (params.has('embed')) {
+  if (EMBED) {
     document.documentElement.classList.add('embed');
   }
 
   const doDeepLink = function() {
+    const params = new URLSearchParams(url.search);
     const query = params.get('q');
     if (query) {
       queryInput.value = query;
-      doSearch().then(results => {
-        populateResultsPage();
-        populateBugStatus(lastResults.items);
-      });
+      doSearch();
     }
   };
 

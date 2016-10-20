@@ -59,8 +59,6 @@ header {
   height: 24px;
   width: 145px;
   margin-left: 8px;
-  /*-webkit-filter: grayscale(0.6);*/
-  /*filter: grayscale(0.6);*/
 }
 header h2 {
   color: var(--md-bluegrey-300);
@@ -80,29 +78,41 @@ header h2 {
   background: #fff;
   padding: 8px;
   z-index: 1;
-  width: 400px;
+  width: 420px;
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
               0 1px 10px 0 rgba(0, 0, 0, 0.12),
               0 2px 4px -1px rgba(0, 0, 0, 0.4);
+}
+#autocomplete-footer {
+ margin-top: 8px;
 }
 #search-container {
   position: relative;
 }
 .autocomplete-result {
-  padding: 4px 0;
-}
-.autocomplete-result .autocomplete-browser {
-  min-width: 80px;
-}
-.autocomplete-result a {
+  display: block;
+  line-height: 1.8;
   font-size: inherit !important;
+}
+.autocomplete-result-title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  flex: 1 1 auto;
+}
+.autocomplete-result .search-result-status {
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 2.1;
+  text-transform: lowercase;
 }
 .autocomplete-hint {
   font-style: italic;
   color: var(--md-bluegrey-300);
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 4px;
+  flex: 1 0 auto;
+}
+.autocomplete-result .browser-logo {
+  margin-right: 4px;
 }
 
 #search-section {
@@ -142,19 +152,13 @@ label {
 }
 
 .search-result a,
-.autocomplete-result a {
+.autocomplete-result {
   color: var(--md-blue-600);
   text-decoration: none;
   font-size: 18px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-}
-.search-result-vendor {
-  font-weight: 600;
-  margin-right: 8px;
-  font-size: 18px;
-  white-space: nowrap;
 }
 .snippet {
   color: var(--md-bluegrey-400);
@@ -192,7 +196,7 @@ label {
   font-weight: 300;
   border-radius: 2px;
   cursor: pointer;
-  min-height: 35px;
+  min-height: 30px;
   margin-left: 4px;
 }
 .next-buttons button[disabled] {
@@ -207,6 +211,9 @@ label {
 }
 .embed header {
   display: none
+}
+.embed #search-section > .next-buttons {
+  display: none;
 }
 
 footer {
@@ -239,6 +246,27 @@ footer a {
   display: none;
 }
 
+.browser-logo {
+  background: url("/img/browsers-logos.png") no-repeat 0% 50%;
+  background-size: cover;
+  height: 16px;
+  width: 16px;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+.browser-logo.WebKit {
+  background-position: -20px 50%;
+}
+.browser-logo.Mozilla {
+  background-position: -40px 50%;
+}
+.browser-logo.Opera {
+  background-position: -90px 50%;
+}
+.browser-logo.Edge {
+  background-position: -80px 50%;
+}
+
 @media (max-width: 599px) {
   header h1 {
     font-size: 5vw;
@@ -258,11 +286,8 @@ footer a {
   .browser-logos {
     margin-left: 16px;
   }
-  .next-buttons {
-    margin-left: 16px;
-  }
   .next-buttons button {
-    margin: 0 8px;
+    margin: 0 4px;
     padding: 3px 20px;
   }
   #query-results {
