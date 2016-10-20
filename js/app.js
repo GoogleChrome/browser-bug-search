@@ -500,6 +500,9 @@ autoComplete.addEventListener('keydown', e => {
   const items = autoComplete.querySelectorAll('.autocomplete-result');
 
   switch (e.code) {
+    case 'Escape':
+      toggleAutoComplete();
+      break;
     case 'ArrowUp':
       e.preventDefault();
       selectedAutoCompleteItem -= 1;
