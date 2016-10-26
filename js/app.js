@@ -617,6 +617,13 @@ filtersEls.addEventListener('change', e => {
   doSearch();
 });
 
+const openFullPageResults = document.querySelector('#see-all-results');
+openFullPageResults && openFullPageResults.addEventListener('click', e => {
+  e.preventDefault();
+   const url = 'https://developers.google.com'
+   window.open(`${url}/web/feedback/browser-bug-searcher?q=${queryInput.value}`);
+});
+
 function init() {
   const url = new URL(location);
 

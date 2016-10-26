@@ -42,7 +42,6 @@ html, body {
   color: #212121;
   font: 14px "Roboto", sans-serif;
   font-weight: 400;
-  -webkit-font-smoothing: antialiased;
 }
 [hidden] {
   display: none !important;
@@ -99,8 +98,19 @@ header h2 {
               0 2px 4px -1px rgba(0, 0, 0, 0.4);
 }
 #autocomplete-footer {
- margin-top: 8px;
+  margin-top: 8px;
 }
+#autocomplete-footer .next-buttons {
+  margin-left: 0 !important;
+}
+#see-all-results {
+  text-decoration: none;
+  color: rgba(0,0,0,.5);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 #search-container {
   position: relative;
 }
@@ -117,7 +127,6 @@ header h2 {
 }
 .autocomplete-result .search-result-status {
   padding: 0 4px;
-  font-size: 10px;
   line-height: 2.1;
   text-transform: lowercase;
 }
@@ -132,6 +141,9 @@ header h2 {
 
 #search-section {
   margin: 32px 0 16px 0;
+}
+#search-section .next-buttons {
+  margin-left: 8px;
 }
 #filters {
   padding: 16px 0;
@@ -175,6 +187,10 @@ header h2 {
 
 label {
   white-space: nowrap;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 #query-results {
   margin: 16px 0;
@@ -217,13 +233,13 @@ label {
 }
 .search-result-status {
   padding: 4px 8px;
-  border-radius: 3px;
+  border-radius: 2px;
   background-color: var(--md-blue-800);
   color: #fff;
   display: inline-block;
-  min-height: 22px;
+  min-height: 24px;
   margin-left: 8px;
-  font-size: smaller;
+  font-size: 12px;
   font-weight: 500;
 }
 .layout.horizontal {
@@ -239,17 +255,15 @@ label {
 .layout.horizontal.wrap {
   flex-wrap: wrap;
 }
+
 .next-buttons button {
   border: none;
   color: #fff;
-  /*background: var(--md-blue-600);*/
+  font: 500 14px Roboto,sans-serif;
   text-transform: uppercase;
-  font-size: inherit;
-  font-weight: 500;
   border-radius: 2px;
   cursor: pointer;
-  /*min-height: 30px;*/
-  margin-left: 4px;
+  margin-right: 8px;
 
   background-color: var(--md-lightblue-600);
   box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);

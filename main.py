@@ -19,6 +19,7 @@ __author__ = 'ericbidelman@chromium.org (Eric Bidelman)'
 import json
 import logging
 import os
+import jinja2
 import webapp2
 
 from google.appengine.api import urlfetch
@@ -26,8 +27,37 @@ from google.appengine.api import urlfetch
 
 DEBUG = not os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/')
 
+jinja_loader = jinja2.FileSystemLoader(os.path.dirname(__file__))
+env = jinja2.Environment(
+  loader=jinja_loader,
+  extensions=['jinja2.ext.autoescape'],
+  autoescape=True,
+  trim_blocks=True,
+  variable_start_string='{{',
+  variable_end_string='}}')
 
-class MainPage(webapp2.RequestHandler):
+
+def render(out, template, data={}):
+  try:
+    t = env.get_template(template)
+    out.write(t.render(data).encode('utf-8'))
+  except jinja2.exceptions.TemplateNotFound as e:
+    handle_404(None, out, data, e)
+  except Exception as e:
+    handle_500(None, out, data, e)
+
+def handle_404(req, resp, data, e):
+  resp.set_status(404)
+  # render(resp, '404.html', data)
+  return resp.write('404 error')
+
+def handle_500(req, resp, data, e):
+  logging.exception(e)
+  resp.set_status(500)
+  # render(resp, '500.html', data);
+  return resp.write('500 error')
+
+class CorsHandler(webapp2.RequestHandler):
 
   def get(self):
     origin = 'https://%s' % self.request.environ['HTTP_HOST']
@@ -59,6 +89,25 @@ class MainPage(webapp2.RequestHandler):
       logging.exception('Could not fetch url: %s' % url)
 
 
+class PageHandler(webapp2.RequestHandler):
+
+  def get(self, path):
+    #client_id = self.request.get('client')
+    #if client_id != 'devsite':
+    #  self.response.set_status(403)
+    #  return self.response.write('client id "%s" not recognized' % client_id)
+
+    data = {
+
+    }
+
+    if (path == 'devsite'):
+      return render(self.response, 'devsite.html', data)
+
+    render(self.response, 'index.html', data)
+
+
 app = webapp2.WSGIApplication([
-  ('/cors', MainPage),
+  ('/cors', CorsHandler),
+  ('/(.*)', PageHandler),
 ], debug=DEBUG)

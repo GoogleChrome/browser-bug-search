@@ -10,10 +10,10 @@ builtins:
 - remote_api: on
 
 libraries:
-- name: webapp2
-  version: "latest"
-- name: django
-  version: "1.4" #"latest"
+  - name: jinja2
+    version: "2.6"
+  - name: webapp2
+    version: "2.5.2"
 
 handlers:
 
@@ -60,9 +60,12 @@ handlers:
   script: main.app
   secure: always
 
+- url: /devsite
+  script: main.app
+  secure: always
+
 - url: /
-  static_files: index.html
-  upload: index\.html
+  script: main.app
   secure: always
 
 skip_files:
@@ -90,3 +93,5 @@ skip_files:
 - ^static/sass
 - ^.*Makefile
 - ^bower_components/url-search-params/template/.*
+- bower_components/[^/]+/bower_components/.*$
+- bower_components/(.+/)+(test/|demo/|README|AUTHORS|CONTRIBUTING|PATENTS|Makefile)
