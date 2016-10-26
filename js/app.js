@@ -415,17 +415,21 @@ function updateQueryStats(results) {
   const startIdx = results.queries.request[0].startIndex || 0;
   const num = results.queries.request[0].count;
 
-  queryResults.querySelector('.query-total-results').textContent = totalResults;
-  queryResults.querySelector('.query-term').textContent = queryInput.value;
-  queryResults.querySelector('.query-page').textContent =
-      Math.floor(startIdx / num) + 1;
-  queryResults.querySelector('.query-page-total').textContent =
-      Math.floor(totalResults / num) + 1;
-  queryResults.hidden = false;
+  if (queryResults) {
+    queryResults.querySelector('.query-total-results').textContent = totalResults;
+    queryResults.querySelector('.query-term').textContent = queryInput.value;
+    queryResults.querySelector('.query-page').textContent =
+        Math.floor(startIdx / num) + 1;
+    queryResults.querySelector('.query-page-total').textContent =
+        Math.floor(totalResults / num) + 1;
+    queryResults.hidden = false;
+  }
 }
 
 function resetUI() {
-  queryResults.hidden = true;
+  if (queryResults) {
+    queryResults.hidden = true;
+  }
   searchResults.items = [];
   updateNextButtons(true);
   updatePrevButtons(true);
@@ -481,7 +485,10 @@ queryInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.keyCode === 13) {
     const isIframe = parent !== self;
     if (EMBED && isIframe) {
-      window.open(`${location.origin}?q=${queryInput.value}`);
+      // const url = (new URL(document.referrer)).origin;
+      const url = 'https://developers.google.com'
+      // window.open(`${location.origin}?q=${queryInput.value}`);
+      window.open(`${url}/web/feedback/browser-bug-searcher?q=${queryInput.value}`);
     }
   }
 });
