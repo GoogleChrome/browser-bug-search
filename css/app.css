@@ -256,7 +256,7 @@ footer a {
 
 .embed body {
   margin: 0;
-  padding: 0;
+  padding: 4px;
 }
 .embed header,
 .embed footer {

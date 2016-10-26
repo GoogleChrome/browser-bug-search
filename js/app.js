@@ -478,11 +478,10 @@ queryInput.addEventListener('keydown', e => {
     return;
   }
 
-  if (e.key === 'Enter' || e.keyCode === 13 ||
-      e.key === 'Escape' || e.keyCode === 2) {
-    queryInput.blur(); // kicks off toggleAutoComplete().
-    if (!lastResults.items) {
-      doSearch();
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    const isIframe = parent !== self;
+    if (EMBED && isIframe) {
+      window.open(`${location.origin}?q=${queryInput.value}`);
     }
   }
 });
