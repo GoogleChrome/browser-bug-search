@@ -526,12 +526,14 @@ autoComplete.addEventListener('keydown', e => {
       e.preventDefault();
       if (prevStartIndex !== null) {
         doSearch(prevStartIndex);
+        // TODO: update URL with index of results page.
       }
       break;
     case 'ArrowRight':
       e.preventDefault();
       if (nextStartIndex !== null) {
         doSearch(nextStartIndex);
+        // TODO: update URL with index of results page.
       }
       break;
     default:
@@ -555,8 +557,9 @@ queryInput.addEventListener('blur', function(e) {
 
 const nextButtons = Array.from(document.querySelectorAll('.next-results-button'));
 nextButtons.forEach(nextButton => {
- nextButton.addEventListener('click', e => {
+  nextButton.addEventListener('click', e => {
     doSearch(nextStartIndex);
+    // TODO: update URL with index of results page.
   });
 });
 
@@ -564,6 +567,7 @@ const prevButtons = Array.from(document.querySelectorAll('.prev-results-button')
 prevButtons.forEach(prevButton => {
   prevButton.addEventListener('click', e => {
     doSearch(prevStartIndex);
+    // TODO: update URL with index of results page.
   });
 });
 
@@ -579,6 +583,7 @@ const resetSearchButton = document.querySelector('.search-reset');
 resetSearchButton.addEventListener('click', e => {
   queryInput.value = null;
   resetUI();
+  toggleAutoComplete();
   // clear auto complete results outside of resetUI() b/c we don't want to
   // nuke the results as users type into the search box.
   autoCompleteTemplate.items = [];
@@ -626,10 +631,6 @@ openFullPageResults && openFullPageResults.addEventListener('click', e => {
 
 function init() {
   const url = new URL(location);
-
-  if (EMBED) {
-    document.documentElement.classList.add('embed');
-  }
 
   const doDeepLink = function() {
     const params = new URLSearchParams(url.search);

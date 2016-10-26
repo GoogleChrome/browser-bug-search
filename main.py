@@ -92,13 +92,13 @@ class CorsHandler(webapp2.RequestHandler):
 class PageHandler(webapp2.RequestHandler):
 
   def get(self, path):
-    #client_id = self.request.get('client')
+    EMBED = self.request.get('embed', None) is not None
     #if client_id != 'devsite':
     #  self.response.set_status(403)
     #  return self.response.write('client id "%s" not recognized' % client_id)
 
     data = {
-
+      'EMBED': EMBED
     }
 
     if (path == 'devsite'):
