@@ -24,6 +24,7 @@ const DEBOUNCE_SEARCH = 350; //ms
 
 // Can't use url.searchParams b/c Safari doesn't support it.
 const EMBED = (new URLSearchParams(location.search)).has('embed');
+let CLIENT_ID = null;
 
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
@@ -367,6 +368,9 @@ function populateResultsPage() {
   if (EMBED) {
     url += '&embed';
   }
+  if (CLIENT_ID) {
+    url += `&client=${CLIENT_ID}`;
+  }
   history.pushState({}, '', url);
 }
 
@@ -622,18 +626,11 @@ filtersEls.addEventListener('change', e => {
   doSearch();
 });
 
-const openFullPageResults = document.querySelector('#see-all-results');
-openFullPageResults && openFullPageResults.addEventListener('click', e => {
-  e.preventDefault();
-   const url = 'https://developers.google.com'
-   window.open(`${url}/web/feedback/browser-bug-searcher?q=${queryInput.value}`);
-});
-
 function init() {
   const url = new URL(location);
+  const params = new URLSearchParams(url.search);
 
   const doDeepLink = function() {
-    const params = new URLSearchParams(url.search);
     const query = params.get('q');
     if (query) {
       queryInput.value = query;
@@ -643,6 +640,21 @@ function init() {
     }
   };
 
+  const initFullResultsLink = function() {
+    const link = document.querySelector('#see-all-results');
+    if (link) {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        window.open(`${link.href}?q=${queryInput.value}`);
+      });
+
+      CLIENT_ID = params.get('client');
+      if (CLIENT_ID === 'devsite') {
+        link.href = 'https://developers.google.com/web/feedback/browser-bug-searcher';
+      }
+    }
+  }
+
   const htmlImport = document.querySelector('link[rel="import"]');
   if (htmlImport) {
     htmlImport.addEventListener('load', doDeepLink);
@@ -651,6 +663,7 @@ function init() {
   }
 
   lazyLoadWCPolyfillsIfNecessary();
+  initFullResultsLink();
 }
 
 init();
