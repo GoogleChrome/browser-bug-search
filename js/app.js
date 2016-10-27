@@ -24,7 +24,7 @@ const DEBOUNCE_SEARCH = 350; //ms
 
 // Can't use url.searchParams b/c Safari doesn't support it.
 const EMBED = (new URLSearchParams(location.search)).has('embed');
-let CLIENT_ID = null;
+let CLIENT_ID = window.CLIENT_ID || null;
 
 const queryInput = document.querySelector('#q');
 const searchResults = document.querySelector('#search-results-template');
@@ -368,9 +368,6 @@ function populateResultsPage() {
   if (EMBED) {
     url += '&embed';
   }
-  if (CLIENT_ID) {
-    url += `&client=${CLIENT_ID}`;
-  }
   history.pushState({}, '', url);
 }
 
@@ -489,10 +486,7 @@ queryInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.keyCode === 13) {
     const isIframe = parent !== self;
     if (EMBED && isIframe) {
-      // const url = (new URL(document.referrer)).origin;
-      const url = 'https://developers.google.com'
-      // window.open(`${location.origin}?q=${queryInput.value}`);
-      window.open(`${url}/web/feedback/browser-bug-searcher?q=${queryInput.value}`);
+      document.querySelector('#see-all-results').click();
     }
   }
 });
@@ -648,7 +642,6 @@ function init() {
         window.open(`${link.href}?q=${queryInput.value}`);
       });
 
-      CLIENT_ID = params.get('client');
       if (CLIENT_ID === 'devsite') {
         link.href = 'https://developers.google.com/web/feedback/browser-bug-searcher';
       }
