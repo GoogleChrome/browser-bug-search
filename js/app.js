@@ -256,6 +256,8 @@ function doSearch(startIndex=null) {
     formatResults(results);
     populateResultsPage();
     populateBugStatuses(results.items);
+
+    window.ga && ga('send', 'event', 'Search', 'results');
   })
   .catch(msg => Promise.reject(msg));
 }
@@ -524,6 +526,7 @@ autoComplete.addEventListener('keydown', e => {
       e.preventDefault();
       if (prevStartIndex !== null) {
         doSearch(prevStartIndex);
+        window.ga && ga('send', 'event', 'Search', 'next page');
         // TODO: update URL with index of results page.
       }
       break;
@@ -531,6 +534,7 @@ autoComplete.addEventListener('keydown', e => {
       e.preventDefault();
       if (nextStartIndex !== null) {
         doSearch(nextStartIndex);
+        window.ga && ga('send', 'event', 'Search', 'previous page');
         // TODO: update URL with index of results page.
       }
       break;
@@ -557,6 +561,7 @@ const nextButtons = Array.from(document.querySelectorAll('.next-results-button')
 nextButtons.forEach(nextButton => {
   nextButton.addEventListener('click', e => {
     doSearch(nextStartIndex);
+    window.ga && ga('send', 'event', 'Search', 'next page');
     // TODO: update URL with index of results page.
   });
 });
@@ -565,6 +570,7 @@ const prevButtons = Array.from(document.querySelectorAll('.prev-results-button')
 prevButtons.forEach(prevButton => {
   prevButton.addEventListener('click', e => {
     doSearch(prevStartIndex);
+    window.ga && ga('send', 'event', 'Search', 'previous page');
     // TODO: update URL with index of results page.
   });
 });
@@ -640,6 +646,7 @@ function init() {
       link.addEventListener('click', e => {
         e.preventDefault();
         window.open(`${link.href}?q=${queryInput.value}`);
+        window.ga && ga('send', 'event', 'Search', 'open full results');
       });
 
       if (CLIENT_ID === 'devsite') {
