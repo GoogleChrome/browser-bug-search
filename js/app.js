@@ -476,14 +476,14 @@ queryInput.addEventListener('input', e => {
 });
 
 queryInput.addEventListener('keydown', e => {
-  if (e.code === 'ArrowDown') {
+  if (e.keyCode === 40) {
     const firstItem = autoComplete.querySelector('.autocomplete-result');
     selectedAutoCompleteItem = 0;
     firstItem.focus();
     return;
   }
 
-  if (e.key === 'Enter' || e.keyCode === 13) {
+  if (e.keyCode === 13) {
     const isIframe = parent !== self;
     if (EMBED && isIframe) {
       document.querySelector('#see-all-results').click();
@@ -503,11 +503,11 @@ function toggleAutoComplete(forceOpen=false) {
 autoComplete.addEventListener('keydown', e => {
   const items = autoComplete.querySelectorAll('.autocomplete-result');
 
-  switch (e.code) {
-    case 'Escape':
+  switch (e.keyCode) {
+    case 27: // ESC
       toggleAutoComplete();
       break;
-    case 'ArrowUp':
+    case 38: // Up
       e.preventDefault();
       selectedAutoCompleteItem -= 1;
       selectedAutoCompleteItem = (
@@ -515,19 +515,19 @@ autoComplete.addEventListener('keydown', e => {
           selectedAutoCompleteItem);
       items[selectedAutoCompleteItem].focus();
       break;
-    case 'ArrowDown':
+    case 40: // Down
       e.preventDefault();
       selectedAutoCompleteItem = (selectedAutoCompleteItem + 1) % items.length;
       items[selectedAutoCompleteItem].focus();
       break;
-    case 'ArrowLeft':
+    case 37: // Left
       e.preventDefault();
       if (prevStartIndex !== null) {
         doSearch(prevStartIndex);
         // TODO: update URL with index of results page.
       }
       break;
-    case 'ArrowRight':
+    case 39: // Right
       e.preventDefault();
       if (nextStartIndex !== null) {
         doSearch(nextStartIndex);
