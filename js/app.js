@@ -548,12 +548,12 @@ queryInput.addEventListener('focus', function() {
 });
 
 queryInput.addEventListener('blur', function(e) {
-  // If users clicks auto complete result, don't populate page.
-  if (e.relatedTarget) {
+  // // If users clicks auto complete result, don't populate page.
+  if (!e.relatedTarget) {
     return;
   }
 
-  toggleAutoComplete();
+  // toggleAutoComplete();
   populateResultsPage();
 });
 
