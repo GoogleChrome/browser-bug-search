@@ -591,9 +591,11 @@ resetSearchButton.addEventListener('click', e => {
   // clear auto complete results outside of resetUI() b/c we don't want to
   // nuke the results as users type into the search box.
   autoCompleteTemplate.items = [];
-  const url = new URL(location);
-  url.searchParams.delete('q');
-  history.pushState({}, '', url);
+  const url = new URL(location.href);
+  // Safari doesn't support url.searchParams, so can't use directly.
+  const params = new URLSearchParams(location.search);
+  params.delete('q');
+  history.pushState({}, '', `${url.origin + url.pathname}?${params.toString()}`);
 });
 
 
