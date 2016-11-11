@@ -6,7 +6,7 @@ const $ = gulpLoadPlugins();
 
 function license() {
   return $.license('Apache', {
-    organization: 'Copyright (c) 2016 Google Ince. All rights reserved.',
+    organization: 'Copyright (c) 2016 Google Inc. All rights reserved.',
     tiny: true
   });
 }
