@@ -1,5 +1,5 @@
 application: browser-issue-tracker-search
-version: 2016-10-26
+version: 2016-12-07
 runtime: python27
 threadsafe: true
 api_version: 1
