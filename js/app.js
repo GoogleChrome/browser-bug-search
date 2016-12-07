@@ -652,7 +652,7 @@ function init() {
       });
 
       if (CLIENT_ID === 'devsite') {
-        link.href = 'https://developers.google.com/web/feedback/browser-bug-searcher';
+        link.href = `${location.origin}/web/feedback/browser-bug-searcher`;
       }
     }
   }

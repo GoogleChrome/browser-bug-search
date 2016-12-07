@@ -16,6 +16,18 @@ Now run:
 
 > Note: you need to be an admin of the App Engine project to deploy.
 
+Build the site:
+
+    gulp
+
+You'll need to do this every time you change parts of the app.
+
+Then, in the main project root, run the GAE dev server:
+
+    dev_appserver.py .
+
+### Deploy
+
 To deploy the site, update app.yaml with a new version and run:
 
     npm run deploy
