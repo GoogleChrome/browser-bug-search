@@ -651,8 +651,11 @@ function init() {
         window.ga && ga('send', 'event', 'Search', 'open full results');
       });
 
+      const iframeURL = new URL(document.referrer);
+
       if (CLIENT_ID === 'devsite') {
-        link.href = `${location.origin}/web/feedback/browser-bug-searcher`;
+        const base = iframeURL.origin || 'https://developers.google.com';
+        link.href = `${base}/web/feedback/browser-bug-searcher`;
       }
     }
   }
