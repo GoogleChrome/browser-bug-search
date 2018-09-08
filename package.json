@@ -4,10 +4,10 @@
   "description": "Search across all major browser vendor issue trackers",
   "main": "index.html",
   "scripts": {
-    "postinstall": "npm run deps; npm run build",
+    "postinstall": "npm run deps & npm run build",
     "build": "gulp",
-    "deploy": "npm run build; appcfg.py update .",
-    "deps": "rm -rf bower_components; bower install"
+    "deploy": "npm run build & appcfg.py update.",
+    "deps": "rm -rf bower_components & bower install"
   },
   "repository": {
     "type": "git",
