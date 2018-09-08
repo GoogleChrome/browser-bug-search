@@ -5,11 +5,15 @@ Demo: https://browser-issue-tracker-search.appspot.com
 ## Contributing
 
 1. Install the [App Engine Python SDK](https://cloud.google.com/appengine/downloads).
-2. Install Bower if you don't already have it: `npm install bower -g`
+2. Install Bower if you don't already have it: `npm install bower -g` or `yarn global add bower`
 
 Now run:
 
     npm install
+
+or
+
+    yarn
 
 
 ### Deployment
